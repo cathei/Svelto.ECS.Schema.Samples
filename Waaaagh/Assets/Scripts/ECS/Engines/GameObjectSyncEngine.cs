@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Svelto.DataStructures;
 using Svelto.ECS;
 using Svelto.ECS.Schema;
+using UnityEngine;
 
 namespace Cathei.Waaagh
 {
@@ -30,9 +31,13 @@ namespace Cathei.Waaagh
                 {
                     ref var instance = ref result.set.instance[i];
                     ref var position = ref result.set.position[i];
+                    ref var tint = ref result.set.tint[i];
 
-                    var gameObject = _goManager.Get(instance.instanceID);
-                    gameObject.transform.position = position.value;
+                    var bridge = _goManager.Get(instance.instanceID);
+                    bridge.transform.position = position.value;
+                    bridge.sprite.color = tint.value;
+
+                    tint.value = Color.Lerp(tint.value, bridge.originalColor, deltaTime);
                 }
             }
         }

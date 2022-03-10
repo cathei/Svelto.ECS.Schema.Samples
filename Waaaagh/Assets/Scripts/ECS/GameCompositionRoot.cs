@@ -45,7 +45,7 @@ namespace Cathei.Waaagh
 
             _enginesRoot.AddEngine(damageFeedbackEngine);
 
-            var gameObjectSpawnEngine = new GameObjectSpawnEngine(indexedDB, schema, entityFactory, goManager);
+            var gameObjectSpawnEngine = new GameObjectSpawnEngine(indexedDB, schema, goManager);
             var gameObjectSyncEngine = new GameObjectSyncEngine(indexedDB, schema, goManager);
 
             _enginesRoot.AddEngine(gameObjectSpawnEngine);

@@ -14,11 +14,15 @@ namespace Cathei.Waaagh
         {
             Guardman = 0,
             Archer = 1,
+            Mage = 2,
 
             Orcs = 100,
             OrcsSpawn = 101,
 
-            Arrow = 200
+            Arrow = 200,
+            Fireball = 201,
+
+            HpBar = 500
         }
     }
 }

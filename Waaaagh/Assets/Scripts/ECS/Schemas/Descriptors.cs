@@ -6,8 +6,9 @@ using Svelto.ECS.Schema.Definition;
 namespace Cathei.Waaagh
 {
     public interface IDamagableRow :
+        IMemorableRow,
         IQueryableRow<DefensibleSet>,
-        IMemorableRow
+        IQueryableRow<DamageFeedbackSet>
     { }
 
     public interface ICharacterRow :

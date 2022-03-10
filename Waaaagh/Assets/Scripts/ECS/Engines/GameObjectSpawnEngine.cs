@@ -9,16 +9,13 @@ namespace Cathei.Waaagh
     public class GameObjectSpawnEngine : ReactToRowEngine<IGameObjectRow, GameObjectComponent>
     {
         private readonly GameSchema _schema;
-        private readonly IEntityFactory _factory;
         private readonly GameObjectResourceManager _goManager;
 
         public string name => nameof(GameObjectSpawnEngine);
 
-        public GameObjectSpawnEngine(IndexedDB indexedDB, GameSchema schema, IEntityFactory factory,
-            GameObjectResourceManager goManager) : base(indexedDB)
+        public GameObjectSpawnEngine(IndexedDB indexedDB, GameSchema schema, GameObjectResourceManager goManager) : base(indexedDB)
         {
             _schema = schema;
-            _factory = factory;
             _goManager = goManager;
         }
 

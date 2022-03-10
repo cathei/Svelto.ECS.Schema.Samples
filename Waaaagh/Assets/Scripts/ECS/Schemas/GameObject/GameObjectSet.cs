@@ -6,16 +6,17 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public struct GameObjectSet : IResultSet<PositionComponent, GameObjectComponent>
+    public struct GameObjectSet : IResultSet<PositionComponent, GameObjectComponent, TintComponent>
     {
         public NB<PositionComponent> position;
         public NB<GameObjectComponent> instance;
+        public NB<TintComponent> tint;
 
         public int count { get; set; }
 
-        public void Init(in EntityCollection<PositionComponent, GameObjectComponent> buffers)
+        public void Init(in EntityCollection<PositionComponent, GameObjectComponent, TintComponent> buffers)
         {
-            (position, instance, count) = buffers;
+            (position, instance, tint, count) = buffers;
         }
     }
 }

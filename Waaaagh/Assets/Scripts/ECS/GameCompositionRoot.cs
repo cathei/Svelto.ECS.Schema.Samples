@@ -24,17 +24,40 @@ namespace Cathei.Waaagh
 
         public void OnContextInitialized<T>(T contextHolder)
         {
+            var entityFactory = _enginesRoot.GenerateEntityFactory();
+            var entityFunctions = _enginesRoot.GenerateEntityFunctions();
+
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
-            var movementEngine = new ApplyMovementEngine(indexedDB, schema);
-            var damageEngine = new ApplyDamageEngine(indexedDB, schema);
+            var goManager = new GameObjectResourceManager();
 
-            var tickableEnginesGroup = new TickableEnginesGroup(new FasterList<IStepEngine>(new IStepEngine[] 
-            {
-                movementEngine,
-                damageEngine,
-            }));
+            var applyMovementEngine = new ApplyMovementEngine(indexedDB, schema);
+            var applyDamageEngine = new ApplyDamageEngine(indexedDB, schema);
+
+            _enginesRoot.AddEngine(applyMovementEngine);
+            _enginesRoot.AddEngine(applyDamageEngine);
+
+            var damageFeedbackEngine = new DamageFeedbackEngine(indexedDB, schema);
+
+            _enginesRoot.AddEngine(damageFeedbackEngine);
+
+            var gameObjectSpawnEngine = new GameObjectSpawnEngine(indexedDB, schema, entityFactory, goManager);
+            var gameObjectSyncEngine = new GameObjectSyncEngine(indexedDB, schema, goManager);
+
+            _enginesRoot.AddEngine(gameObjectSpawnEngine);
+            _enginesRoot.AddEngine(gameObjectSyncEngine);
+
+            var tickableEnginesGroup = new TickableEnginesGroup(new FasterList<IStepEngine<float>>(
+                new IStepEngine<float>[]
+                {
+                    applyMovementEngine,
+                    applyDamageEngine,
+                    damageFeedbackEngine,
+                    gameObjectSyncEngine
+                }));
+
+            _enginesRoot.AddEngine(tickableEnginesGroup);
 
             _gameLoop = GameLoop.Create(_simpleSubmitScheduler, tickableEnginesGroup);
         }
@@ -45,8 +68,8 @@ namespace Cathei.Waaagh
         }
     }
 
-    public class TickableEnginesGroup : UnsortedEnginesGroup<IStepEngine>
+    public class TickableEnginesGroup : UnsortedEnginesGroup<IStepEngine<float>, float>
     {
-        public TickableEnginesGroup(FasterList<IStepEngine> engines) : base(engines) { }
+        public TickableEnginesGroup(FasterList<IStepEngine<float>> engines) : base(engines) { }
     }
 }

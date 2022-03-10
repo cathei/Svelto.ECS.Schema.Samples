@@ -6,17 +6,20 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public class DamageFeedbackEngine : IStepEngine<float>
+    public class GameObjectSyncEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
         private readonly GameSchema _schema;
 
-        public string name => nameof(DamageFeedbackEngine);
+        private readonly GameObjectResourceManager _goManager;
 
-        public DamageFeedbackEngine(IndexedDB indexedDB, GameSchema schema)
+        public string name => nameof(GameObjectSyncEngine);
+
+        public GameObjectSyncEngine(IndexedDB indexedDB, GameSchema schema, GameObjectResourceManager goManager)
         {
             _indexedDB = indexedDB;
             _schema = schema;
+            _goManager = goManager;
         }
 
         public void Step(in float deltaTime)

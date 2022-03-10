@@ -19,7 +19,7 @@ namespace Cathei.Waaagh
             _schema = schema;
         }
 
-        public void Step(float deltaTime)
+        public void Step(in float deltaTime)
         {
 
         }

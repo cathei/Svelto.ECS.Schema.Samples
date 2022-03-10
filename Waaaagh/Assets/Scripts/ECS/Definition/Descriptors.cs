@@ -8,6 +8,7 @@ namespace Cathei.Waaagh
     public interface IDamagableRow :
         IQueryableRow<DefensibleSet>,
         IMemorableRow
+    { }
 
     public interface ICharacterRow :
         IDamagableRow,
@@ -25,9 +26,14 @@ namespace Cathei.Waaagh
         IQueryableRow<HealthRegenerableSet>
     { }
 
-    public sealed class OrcsRow : DescriptorRow<OrcsRow>, ICharacterRow { }
-    public sealed class OrcsSpawnRow : DescriptorRow<OrcsSpawnRow>, IOrcSpawnRow { }
+    public interface IGameObjectRow :
+        IQueryableRow<GameObjectSet>,
+        IReactiveRow<GameObjectComponent>
+    { }
 
-    public sealed class HumanRow : DescriptorRow<HumanRow>, ICharacterRow { }
-    public sealed class ArrowRow : DescriptorRow<ArrowRow>, IProjectileRow { }
+    public sealed class OrcsRow : DescriptorRow<OrcsRow>, IGameObjectRow, ICharacterRow { }
+    public sealed class OrcsSpawnRow : DescriptorRow<OrcsSpawnRow>, IGameObjectRow, IOrcSpawnRow { }
+
+    public sealed class HumanRow : DescriptorRow<HumanRow>, IGameObjectRow, ICharacterRow { }
+    public sealed class ArrowRow : DescriptorRow<ArrowRow>, IGameObjectRow, IProjectileRow { }
 }

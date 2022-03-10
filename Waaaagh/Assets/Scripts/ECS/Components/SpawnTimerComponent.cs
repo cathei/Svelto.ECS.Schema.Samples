@@ -9,5 +9,11 @@ namespace Cathei.Waaagh
     {
         public float current;
         public float nextSpawn;
+
+        public SpawnTimerComponent(float nextSpawn)
+        {
+            this.current = 0;
+            this.nextSpawn = nextSpawn;
+        }
     }
 }

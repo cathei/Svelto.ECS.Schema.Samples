@@ -22,14 +22,14 @@ namespace Cathei.Waaagh
             _goManager = goManager;
         }
 
-        protected override void Add(ref GameObjectComponent entityComponent, IEntityTable<IGameObjectRow> table, uint entityID)
+        protected override void Add(ref GameObjectComponent instance, IEntityTable<IGameObjectRow> table, uint entityID)
         {
-
+            instance.instanceID = _goManager.Create(instance.prefabID);
         }
 
-        protected override void Remove(ref GameObjectComponent entityComponent, IEntityTable<IGameObjectRow> table, uint entityID)
+        protected override void Remove(ref GameObjectComponent instance, IEntityTable<IGameObjectRow> table, uint entityID)
         {
-
+            _goManager.Return(instance.prefabID, instance.instanceID);
         }
     }
 }

@@ -8,5 +8,10 @@ namespace Cathei.Waaagh
     public struct DefenseComponent : IEntityComponent
     {
         public int value;
+
+        public DefenseComponent(int value)
+        {
+            this.value = value;
+        }
     }
 }

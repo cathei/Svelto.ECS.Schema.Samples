@@ -10,7 +10,10 @@ namespace Cathei.Waaagh
         public readonly Table<OrcsRow> Orcs = new();
         public readonly Table<OrcsSpawnRow> OrcsSpawn = new();
 
-        public readonly Table<HumanRow> Human = new();
+        public readonly Table<HumanRow> Guardman = new();
+        public readonly Table<HumanRow> Archer = new();
+        public readonly Table<HumanRow> Mage = new();
+
         public readonly Table<ArrowRow> Arrow = new();
 
         public readonly Memo<IDamagableRow> Damaged = new();

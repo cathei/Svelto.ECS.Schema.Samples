@@ -24,13 +24,16 @@ namespace Cathei.Waaagh
 
         public void OnContextInitialized<T>(T contextHolder)
         {
+            var gameContext = contextHolder as GameContext;
+            var designsDB = gameContext.designsDB;
+
             var entityFactory = _enginesRoot.GenerateEntityFactory();
             var entityFunctions = _enginesRoot.GenerateEntityFunctions();
 
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
-            var goManager = new GameObjectResourceManager();
+            var goManager = new GameObjectResourceManager(designsDB);
 
             var applyMovementEngine = new ApplyMovementEngine(indexedDB, schema);
             var applyDamageEngine = new ApplyDamageEngine(indexedDB, schema);
@@ -64,7 +67,11 @@ namespace Cathei.Waaagh
 
         public void OnContextDestroyed(bool hasBeenInitialised)
         {
-            _gameLoop.Dispose();
+            if (hasBeenInitialised)
+            {
+                _gameLoop.Dispose();
+                _enginesRoot.Dispose();
+            }
         }
     }
 

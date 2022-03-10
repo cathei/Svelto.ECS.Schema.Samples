@@ -7,7 +7,13 @@ namespace Cathei.Waaagh
 {
     public struct GameObjectComponent : IEntityComponent
     {
-        public int prefabID;
-        public int instanceID;
+        public Constants.PrefabID prefabID;
+        public uint instanceID;
+
+        public GameObjectComponent(Constants.PrefabID prefabID, uint instanceID)
+        {
+            this.prefabID = prefabID;
+            this.instanceID = instanceID;
+        }
     }
 }

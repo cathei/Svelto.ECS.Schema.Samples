@@ -9,5 +9,10 @@ namespace Cathei.Waaagh
     {
         public int current;
         public int max;
+
+        public HealthComponent(int max)
+        {
+            this.current = this.max = max;
+        }
     }
 }

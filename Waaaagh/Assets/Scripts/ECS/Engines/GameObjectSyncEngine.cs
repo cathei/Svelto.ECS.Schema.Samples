@@ -24,7 +24,17 @@ namespace Cathei.Waaagh
 
         public void Step(in float deltaTime)
         {
+            foreach (var result in _indexedDB.Select<GameObjectSet>().FromAll())
+            {
+                foreach (var i in result.indices)
+                {
+                    ref var instance = ref result.set.instance[i];
+                    ref var position = ref result.set.position[i];
 
+                    var gameObject = _goManager.Get(instance.instanceID);
+                    gameObject.transform.position = position.value;
+                }
+            }
         }
     }
 }

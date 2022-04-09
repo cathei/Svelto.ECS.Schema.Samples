@@ -29,9 +29,7 @@ namespace Cathei.Waaagh
                     ref var velocity = ref result.set.velocity[i];
 
                     position.value += velocity.value * deltaTime;
-
                 }
-
             }
         }
     }

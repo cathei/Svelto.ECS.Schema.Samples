@@ -6,7 +6,7 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public struct OrcsSpawnSet : IResultSet<SpawnTimerComponent>
+    public struct SpawnableSet : IResultSet<SpawnTimerComponent>
     {
         public NB<SpawnTimerComponent> spawnTimer;
 
@@ -17,4 +17,6 @@ namespace Cathei.Waaagh
             (spawnTimer, count) = buffers;
         }
     }
+
+    public interface ICanSpawn : IQueryableRow<SpawnableSet> { }
 }

@@ -19,4 +19,9 @@ namespace Cathei.Waaagh
             (position, instance, tint, count) = buffers;
         }
     }
+
+    public interface IHaveGameObject :
+        IQueryableRow<GameObjectSet>,
+        IReactiveRow<GameObjectComponent>
+    { }
 }

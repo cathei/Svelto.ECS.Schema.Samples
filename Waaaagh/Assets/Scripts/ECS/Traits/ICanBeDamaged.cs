@@ -18,4 +18,21 @@ namespace Cathei.Waaagh
             (health, defense, count) = buffers;
         }
     }
+
+    public struct DamageFeedbackSet : IResultSet<TintComponent>
+    {
+        public NB<TintComponent> tint;
+
+        public int count { get; set; }
+
+        public void Init(in EntityCollection<TintComponent> buffers)
+        {
+            (tint, count) = buffers;
+        }
+    }
+
+    public interface ICanBeDamaged :
+        IQueryableRow<DefensibleSet>,
+        IQueryableRow<DamageFeedbackSet>
+    { }
 }

@@ -17,4 +17,7 @@ namespace Cathei.Waaagh
             (damage, count) = buffers;
         }
     }
+
+    public interface ICanAttack :
+        IQueryableRow<AttackableSet> { }
 }

@@ -18,4 +18,6 @@ namespace Cathei.Waaagh
             (position, velocity, count) = buffers;
         }
     }
+
+    public interface ICanMove : IQueryableRow<MovableSet> { }
 }

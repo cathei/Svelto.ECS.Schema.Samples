@@ -16,6 +16,8 @@ namespace Cathei.Waaagh
 
         public readonly Table<ArrowRow> Arrow = new();
 
+        public readonly Index<StatusBurnComponent> StatusBurn = new Index<StatusBurnComponent>();
+
         public readonly Memo<IDamagableRow> Damaged = new();
     }
 }

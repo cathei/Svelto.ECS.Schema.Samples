@@ -6,7 +6,7 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public struct HealthRegenerableSet : IResultSet<HealthComponent, DefenseComponent>
+    public struct HealthRegenSet : IResultSet<HealthComponent, DefenseComponent>
     {
         public NB<HealthComponent> health;
         public NB<DefenseComponent> defense;
@@ -18,4 +18,6 @@ namespace Cathei.Waaagh
             (health, defense, count) = buffers;
         }
     }
+
+    public interface ICanRegenHealth : IQueryableRow<HealthRegenSet> { }
 }

@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using Svelto.DataStructures;
 using Svelto.ECS;
 using Svelto.ECS.Schema;
@@ -11,13 +9,13 @@ namespace Cathei.Waaagh
         public NB<PositionComponent> position;
         public NB<VelocityComponent> velocity;
 
-        public int count { get; set; }
-
         public void Init(in EntityCollection<PositionComponent, VelocityComponent> buffers)
         {
-            (position, velocity, count) = buffers;
+            (position, velocity, _) = buffers;
         }
+
     }
 
-    public interface ICanMove : IQueryableRow<MovableSet> { }
+    public interface IMovableRow : IQueryableRow<MovableSet>
+    { }
 }

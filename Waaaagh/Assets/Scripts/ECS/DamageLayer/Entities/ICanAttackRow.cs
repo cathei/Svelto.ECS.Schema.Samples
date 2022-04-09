@@ -6,7 +6,7 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public struct AttackableSet : IResultSet<DamageComponent>
+    public struct CanAttackSet : IResultSet<DamageComponent>
     {
         public NB<DamageComponent> damage;
 
@@ -18,6 +18,5 @@ namespace Cathei.Waaagh
         }
     }
 
-    public interface ICanAttack :
-        IQueryableRow<AttackableSet> { }
+    public interface ICanAttackRow : IQueryableRow<CanAttackSet> { }
 }

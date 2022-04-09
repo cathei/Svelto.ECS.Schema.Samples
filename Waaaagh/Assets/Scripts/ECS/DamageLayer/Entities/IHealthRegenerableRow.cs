@@ -11,13 +11,11 @@ namespace Cathei.Waaagh
         public NB<HealthComponent> health;
         public NB<DefenseComponent> defense;
 
-        public int count { get; set; }
-
         public void Init(in EntityCollection<HealthComponent, DefenseComponent> buffers)
         {
-            (health, defense, count) = buffers;
+            (health, defense, _) = buffers;
         }
     }
 
-    public interface ICanRegenHealth : IQueryableRow<HealthRegenSet> { }
+    public interface IHealthRegenerableRow : IQueryableRow<HealthRegenSet> { }
 }

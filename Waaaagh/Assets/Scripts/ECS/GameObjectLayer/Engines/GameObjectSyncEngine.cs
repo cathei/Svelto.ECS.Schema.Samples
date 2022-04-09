@@ -10,16 +10,13 @@ namespace Cathei.Waaagh
     public class GameObjectSyncEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
-        private readonly GameSchema _schema;
-
         private readonly GameObjectResourceManager _goManager;
 
         public string name => nameof(GameObjectSyncEngine);
 
-        public GameObjectSyncEngine(IndexedDB indexedDB, GameSchema schema, GameObjectResourceManager goManager)
+        public GameObjectSyncEngine(IndexedDB indexedDB, GameObjectResourceManager goManager)
         {
             _indexedDB = indexedDB;
-            _schema = schema;
             _goManager = goManager;
         }
 

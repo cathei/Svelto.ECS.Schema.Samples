@@ -10,13 +10,11 @@ namespace Cathei.Waaagh
     {
         public NB<SpawnTimerComponent> spawnTimer;
 
-        public int count { get; set; }
-
         public void Init(in EntityCollection<SpawnTimerComponent> buffers)
         {
-            (spawnTimer, count) = buffers;
+            (spawnTimer, _) = buffers;
         }
     }
 
-    public interface ICanSpawn : IQueryableRow<SpawnableSet> { }
+    public interface ISpawnableRow : IQueryableRow<SpawnableSet> { }
 }

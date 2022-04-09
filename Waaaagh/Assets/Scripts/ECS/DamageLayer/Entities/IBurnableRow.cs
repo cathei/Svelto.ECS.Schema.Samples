@@ -11,15 +11,13 @@ namespace Cathei.Waaagh
         public NB<HealthComponent> health;
         public NB<StatusBurnComponent> status;
 
-        public int count { get; set; }
-
         public void Init(in EntityCollection<HealthComponent, StatusBurnComponent> buffers)
         {
-            (health, status, count) = buffers;
+            (health, status, _) = buffers;
         }
     }
 
-    public interface ICanBeBurned :
+    public interface IBurnableRow :
         IIndexableRow<StatusBurnComponent>,
         IQueryableRow<BurnableSet>
     { }

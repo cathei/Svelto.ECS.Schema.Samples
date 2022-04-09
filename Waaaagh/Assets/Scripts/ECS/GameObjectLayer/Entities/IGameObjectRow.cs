@@ -20,7 +20,7 @@ namespace Cathei.Waaagh
         }
     }
 
-    public interface IHaveGameObject :
+    public interface IGameObjectRow :
         IQueryableRow<GameObjectSet>,
         IReactiveRow<GameObjectComponent>
     { }

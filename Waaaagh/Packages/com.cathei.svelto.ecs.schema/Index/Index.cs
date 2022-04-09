@@ -7,24 +7,17 @@ using Svelto.ECS.Schema.Internal;
 
 namespace Svelto.ECS.Schema.Internal
 {
-    internal static class GlobalIndexCount
-    {
-        private static int Count = 0;
-
-        public static int Generate() => Interlocked.Increment(ref Count);
-    }
-
-    public class IndexBase<TRow, TComponent> : IEntityIndex, IIndexQueryable<TRow, TComponent>
+    public abstract class IndexBase<TRow, TComponent> : IEntityIndex, IIndexQueryable<TRow, TComponent>
         where TRow : class, IReactiveRow<TComponent>
-        where TComponent : unmanaged, IIndexableComponent
+        where TComponent : unmanaged, IKeyComponent
     {
         // equvalent to ExclusiveGroupStruct.Generate()
-        internal readonly int _indexerId = GlobalIndexCount.Generate();
+        internal readonly FilterContextID _indexerID = EntitiesDB.SveltoFilters.GetNewContextID();
 
         RefWrapperType IEntityIndex.ComponentType => TypeRefWrapper<TComponent>.wrapper;
 
-        int IEntityIndex.IndexerID => _indexerId;
-        int IIndexQueryable<TRow, TComponent>.IndexerID => _indexerId;
+        FilterContextID IEntityIndex.IndexerID => _indexerID;
+        FilterContextID IIndexQueryable<TRow, TComponent>.IndexerID => _indexerID;
 
         static IndexBase()
         {
@@ -36,7 +29,7 @@ namespace Svelto.ECS.Schema.Internal
 
         void IEntityIndex.AddEngines(EnginesRoot enginesRoot, IndexedDB indexedDB)
         {
-            IndexableComponentHelper<TComponent>.EngineHandler.AddEngines<TRow>(enginesRoot, indexedDB);
+            enginesRoot.AddEngine(new TableIndexingEngine<TRow, TComponent>(indexedDB));
         }
     }
 }
@@ -44,6 +37,6 @@ namespace Svelto.ECS.Schema.Internal
 namespace Svelto.ECS.Schema.Definition
 {
     public sealed class Index<TComponent> : IndexBase<IIndexableRow<TComponent>, TComponent>
-        where TComponent : unmanaged, IIndexableComponent
+        where TComponent : unmanaged, IKeyComponent
     { }
 }

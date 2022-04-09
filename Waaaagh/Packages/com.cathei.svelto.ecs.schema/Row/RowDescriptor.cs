@@ -10,8 +10,14 @@ using Svelto.ECS.Schema.Internal;
 
 namespace Svelto.ECS.Schema.Internal
 {
-    // empty component that always exists
-    internal struct RowIdentityComponent : IEntityComponent { }
+    // component that always exists
+    public struct RowIdentityComponent : IEntityComponent
+    {
+        internal EntityReference selfReference;
+    }
+
+    // component that exists for IPrimaryKeyRow
+    public struct PKIdentityComponent : IEntityComponent { }
 }
 
 namespace Svelto.ECS.Schema
@@ -38,7 +44,7 @@ namespace Svelto.ECS.Schema
                 void addComponentBuilders(Type interfaceType)
                 {
                     var componentBuildersField = interfaceType.GetField(
-                        nameof(IEntityRow<EGIDComponent>.componentBuilders),
+                        nameof(IEntityRow<RowIdentityComponent>.componentBuilders),
                         BindingFlags.Static | BindingFlags.NonPublic);
 
                     var componentBuilders = (IComponentBuilder[])componentBuildersField.GetValue(null);
@@ -61,8 +67,11 @@ namespace Svelto.ECS.Schema
 
                     var genericDefinition = interfaceType.GetGenericTypeDefinition();
 
-                    if (genericDefinition == typeof(IEntityRow<>))
+                    if (genericDefinition == typeof(IEntityRow<>) ||
+                        genericDefinition == typeof(IReactiveRow<>))
+                    {
                         addComponentBuilders(interfaceType);
+                    }
 
                     if (genericDefinition == typeof(IQueryableRow<>))
                     {

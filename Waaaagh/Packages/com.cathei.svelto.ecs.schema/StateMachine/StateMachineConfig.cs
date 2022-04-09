@@ -3,25 +3,14 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Svelto.DataStructures;
 using Svelto.ECS.Hybrid;
+using Svelto.ECS.Internal;
+using Svelto.ECS.Schema.Definition;
 using Svelto.ECS.Schema.Internal;
 
-namespace Svelto.ECS.Schema.Definition
+namespace Svelto.ECS.Schema.Internal
 {
-    public struct StateMachineResultSet<TComponent> : IResultSet<TComponent>
-        where TComponent : unmanaged, IStateMachineComponent
-    {
-        public NB<TComponent> component;
-
-        public int count { get; set; }
-
-        public void Init(in EntityCollection<TComponent> buffers)
-        {
-            (component, count) = buffers;
-        }
-    }
-
     internal abstract class StateMachineConfigBase<TComponent>
-        where TComponent : unmanaged, IStateMachineComponent
+        where TComponent : unmanaged, IKeyComponent
     {
         internal abstract IStepEngine AddEngines(EnginesRoot enginesRoot, IndexedDB indexedDB);
         internal abstract void Process(IndexedDB indexedDB);
@@ -31,23 +20,35 @@ namespace Svelto.ECS.Schema.Definition
 
         protected StateMachineConfigBase()
         {
-            _index = new Index<TComponent>();
+            _index = new();
+        }
+    }
+
+    public struct StateMachineSet<TComponent> : IResultSet<TComponent>
+        where TComponent : unmanaged, IEntityComponent
+    {
+        public NB<TComponent> component;
+        public NativeEntityIDs entityIDs;
+
+        public void Init(in EntityCollection<TComponent> buffers)
+        {
+            (component, entityIDs, _) = buffers;
         }
     }
 
     internal sealed partial class StateMachineConfig<TRow, TComponent, TState> : StateMachineConfigBase<TComponent>
-        where TRow : class, StateMachine<TComponent>.IIndexableRow
-        where TComponent : unmanaged, IStateMachineComponent<TState>
+        where TRow : class, StateMachine<TComponent>.IStateMachineRow
+        where TComponent : unmanaged, IKeyComponent<TState>
         where TState : unmanaged, IEquatable<TState>
     {
-        // this is real configuration
-        internal static StateMachineConfig<TRow, TComponent, TState> Default =
-            new StateMachineConfig<TRow, TComponent, TState>();
-
-        static StateMachineConfig()
+        public static StateMachineConfig<TRow, TComponent, TState> Get(StateMachine<TComponent> fsm)
         {
-            // propagate to state machine
-            StateMachine<TComponent>.Config = Default;
+            if (fsm.config is StateMachineConfig<TRow, TComponent, TState> result)
+                return result;
+
+            result = new StateMachineConfig<TRow, TComponent, TState>();
+            fsm.config = result;
+            return result;
         }
 
         internal readonly FasterDictionary<TState, State> _states;
@@ -55,20 +56,14 @@ namespace Svelto.ECS.Schema.Definition
 
         internal StateMachineConfig() : base()
         {
-            _states = new FasterDictionary<TState, State>();
-            _anyState = new AnyState(this);
+            _states = new();
+            _anyState = new(this);
         }
 
         internal override IStepEngine AddEngines(EnginesRoot enginesRoot, IndexedDB indexedDB)
         {
-            // this is required to handle added or removed entities
-            var indexingEngine = new TableIndexingEngine<
-                StateMachine<TComponent>.IIndexableRow, TComponent, TState>(indexedDB);
-
-            // this is required to validate and change state
-            var stepEngine = new TransitionEngine(indexedDB);
-
-            enginesRoot.AddEngine(indexingEngine);
+            // required to validate and change state
+            var stepEngine = new TransitionEngine(indexedDB, this);
 
             enginesRoot.AddEngine(stepEngine);
 
@@ -77,38 +72,36 @@ namespace Svelto.ECS.Schema.Definition
 
         internal override void Process(IndexedDB indexedDB)
         {
-            var tables = indexedDB.FindTables<TRow>();
             var states = _states.GetValues(out var stateCount);
 
             // clear all filters before proceed
-            // maybe not needed with new filter system
-            // but again we have to make sure because engine can called multiple times
+            // we'll have to make sure because engine can called multiple times
             for (int i = 0; i < stateCount; ++i)
             {
                 indexedDB.Memo(states[i]._exitCandidates).Clear();
                 indexedDB.Memo(states[i]._enterCandidates).Clear();
             }
 
-            foreach (var result in indexedDB.Select<StateMachineResultSet<TComponent>>().From(tables).Entities())
+            foreach (var result in indexedDB.Select<StateMachineSet<TComponent>>().FromAll<TRow>())
             {
                 for (int i = 0; i < stateCount; ++i)
                 {
-                    states[i].Evaluate(indexedDB, result.set.component, result.table);
+                    states[i].Evaluate(indexedDB, result);
                 }
 
                 // any state transition has lower priority
-                _anyState.Evaluate(indexedDB, result.set.component, result.set.count, result.table);
+                _anyState.Evaluate(indexedDB, result);
 
                 // check for exit candidates
                 for (int i = 0; i < stateCount; ++i)
                 {
-                    states[i].ProcessExit(indexedDB, result.table);
+                    states[i].ProcessExit(indexedDB, result);
                 }
 
                 // check for enter candidates
                 for (int i = 0; i < stateCount; ++i)
                 {
-                    states[i].ProcessEnter(indexedDB, result.set.component, result.table);
+                    states[i].ProcessEnter(indexedDB, result);
                 }
             }
         }

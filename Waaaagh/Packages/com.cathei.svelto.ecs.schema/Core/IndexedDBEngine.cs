@@ -5,16 +5,16 @@ using Svelto.ECS.Schema.Internal;
 
 namespace Svelto.ECS.Schema
 {
-    internal class IndexedDBEngine : IQueryingEntitiesEngine,
-        IReactOnAddAndRemove<RowIdentityComponent>, IReactOnSwap<RowIdentityComponent>, IReactOnSubmission
+    internal class IndexedDBEngine :
+        UnsortedEnginesGroup<IStepEngine>,
+        IQueryingEntitiesEngine,
+        IReactOnAddEx<RowIdentityComponent>
     {
         private readonly IndexedDB _indexedDB;
 
-        private readonly HashSet<ExclusiveGroupStruct> _groupsToRebuild = new HashSet<ExclusiveGroupStruct>();
-
         public EntitiesDB entitiesDB { private get; set; }
 
-        public IndexedDBEngine(IndexedDB indexedDB)
+        public IndexedDBEngine(IndexedDB indexedDB, FasterList<IStepEngine> engines) : base(engines)
         {
             _indexedDB = indexedDB;
         }
@@ -25,26 +25,14 @@ namespace Svelto.ECS.Schema
             _indexedDB.entitiesDB = entitiesDB;
         }
 
-        public void Add(ref RowIdentityComponent entityComponent, EGID egid) { }
-
-        public void Remove(ref RowIdentityComponent entityComponent, EGID egid)
+        public void Add((uint start, uint end) rangeOfEntities, in EntityCollection<RowIdentityComponent> collection, ExclusiveGroupStruct groupID)
         {
-            _groupsToRebuild.Add(egid.groupID);
-        }
+            var (component, entityIDs, _) = collection;
 
-        public void MovedTo(ref RowIdentityComponent entityComponent, ExclusiveGroupStruct previousGroup, EGID egid)
-        {
-            _groupsToRebuild.Add(previousGroup);
-        }
-
-        public void EntitiesSubmitted()
-        {
-            _indexedDB.RebuildFilters(_groupsToRebuild);
-
-            // Even if we call it here, we still need to manually clean memo because
-            // EntitiesSubmitted only called when there is entities to submit
-            // We don't have to do this anyway if we move to new filter system
-            // _indexedDB.ClearMemos();
+            for (uint i = rangeOfEntities.start; i < rangeOfEntities.end; ++i)
+            {
+                component[i].selfReference = entitiesDB.GetEntityReference(new EGID(entityIDs[i], groupID));
+            }
         }
     }
 }

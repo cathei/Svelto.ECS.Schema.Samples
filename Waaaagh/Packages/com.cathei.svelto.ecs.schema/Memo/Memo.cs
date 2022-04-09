@@ -8,155 +8,109 @@ namespace Svelto.ECS.Schema.Internal
 {
     internal static class GlobalMemoCount
     {
+        internal static FilterContextID MemoContextID = EntitiesDB.SveltoFilters.GetNewContextID();
         private static int Count = 0;
 
-        public static int Generate() => Interlocked.Increment(ref Count);
+        public static CombinedFilterID Generate() => new(Interlocked.Increment(ref Count), MemoContextID);
     }
 
-    public abstract class MemoBase : ISchemaDefinitionMemo
+    public abstract class MemoBase : IEntityMemo
     {
         // equvalent to ExclusiveGroupStruct.Generate()
-        internal readonly int _memoID = GlobalMemoCount.Generate();
+        internal readonly CombinedFilterID _filterID = GlobalMemoCount.Generate();
 
-        int ISchemaDefinitionMemo.MemoID => _memoID;
+        CombinedFilterID IEntityMemo.FilterID => _filterID;
 
         internal MemoBase() { }
+
+        internal ref EntityFilterCollection GetFilter(IndexedDB indexedDB)
+        {
+            return ref indexedDB.GetOrAddTransientFilter(_filterID);
+        }
     }
 
-    public abstract class MemoBase<TRow, TComponent> : MemoBase, IIndexQuery<TRow>
-        where TRow : class, IIndexableRow<TComponent>
-        where TComponent : unmanaged, IEntityComponent, INeedEGID
+    public abstract class MemoBase<TRow> : MemoBase, IIndexQuery<TRow>
+        where TRow : class, IEntityRow
     {
         internal MemoBase() { }
 
-        internal void Set<TIndex>(IndexedDB indexedDB, TIndex query)
+        internal void Set<TIndex>(IndexedDB indexedDB, TIndex indexQuery)
             where TIndex : IIndexQuery<TRow>
         {
             indexedDB.ClearMemo(this);
-            Union(indexedDB, query);
+            Union(indexedDB, indexQuery);
         }
 
-        internal void Union<TIndex>(IndexedDB indexedDB, TIndex query)
+        internal void Union<TIndex>(IndexedDB indexedDB, TIndex indexQuery)
             where TIndex : IIndexQuery<TRow>
         {
-            var queryData = query.GetIndexerKeyData(indexedDB).groups;
+            ref var originalFilter = ref GetFilter(indexedDB);
 
-            // if empty nothing to add
-            if (queryData == null)
-                return;
-
-            var queryDataValues = queryData.GetValues(out var queryDataCount);
-
-            for (int groupIndex = 0; groupIndex < queryDataCount; ++groupIndex)
+            foreach (var query in indexedDB.FromAll<TRow>().Where(indexQuery))
             {
-                var queryGroupData = queryDataValues[groupIndex];
+                var groupFilter = originalFilter.GetGroupFilter(query.group);
 
-                // if empty nothing to add
-                if (queryGroupData.filter.filteredIndices.Count() == 0)
-                    continue;
-
-                var table = indexedDB.FindTable<TRow>(queryGroupData.groupID);
-
-                // type mismatch - noathing to add
-                if (table == null)
-                    continue;
-
-                var mapper = indexedDB.GetEGIDMapper(queryGroupData.groupID);
-
-                // TODO: change group to table!
-                var result = indexedDB.Select<IndexableResultSet<TComponent>>().From(table).Entities();
-
-                ref var originalGroupData = ref indexedDB.CreateOrGetMemoGroup(_memoID, table);
-
-                foreach (var i in new IndexedIndices(queryGroupData.filter.filteredIndices))
-                    originalGroupData.filter.Add(result.set.component[i].ID.entityID, mapper);
+                foreach (var i in query.indices)
+                    groupFilter.Add(query.egid[i].entityID, i);
             }
         }
 
-        internal void Intersect<TIndex>(IndexedDB indexedDB, TIndex query)
+        internal void Intersect<TIndex>(IndexedDB indexedDB, TIndex other)
             where TIndex : IIndexQuery<TRow>
         {
-            var originalData = GetIndexerKeyData(indexedDB).groups;
+            ref var originalFilter = ref GetFilter(indexedDB);
 
-            // if empty nothing to intersect
-            if (originalData == null)
-                return;
+            var otherQueries = indexedDB.FromAll<TRow>().Where(other);
 
-            var queryData = query.GetIndexerKeyData(indexedDB).groups;
+            otherQueries.Build();
 
-            // if empty nothing to intersect
-            if (queryData == null)
+            for (int groupIndex = 0; groupIndex < originalFilter.groupCount; ++groupIndex)
             {
-                indexedDB.ClearMemo(this);
-                return;
-            }
-
-            var originalDataValues = originalData.GetValues(out var originalDataCount);
-
-            for (int groupIndex = 0; groupIndex < originalDataCount; ++groupIndex)
-            {
-                ref var originalGroupData = ref originalDataValues[groupIndex];
+                var groupFilter = originalFilter.GetGroup(groupIndex);
 
                 // if group is empty there is nothing to remove
-                if (originalGroupData.filter.filteredIndices.Count() == 0)
+                if (groupFilter.count == 0)
                     continue;
 
                 // if target is empty there is no intersection
-                if (!queryData.TryGetValue(originalDataValues[groupIndex].groupID, out var queryGroupData) ||
-                    queryGroupData.filter.filteredIndices.Count() == 0)
-                {
-                    originalGroupData.filter.Clear();
+                if (!otherQueries.config.temporaryGroups.ContainsKey(groupFilter.group))
+                    groupFilter.Clear();
+            }
+
+            foreach (var otherQuery in otherQueries)
+            {
+                var groupFilter = originalFilter.GetGroupFilter(otherQuery.group);
+
+                // nothing to remove
+                if (groupFilter.count == 0)
                     continue;
-                }
 
-                var table = indexedDB.FindTable<TRow>(queryGroupData.groupID);
+                var indices = groupFilter.indices;
 
-                // type mismatch - no intersection
-                if (table == null)
+                // reverse iteration so we can remove safely
+                for (int i = (int)(indices.count - 1); i >= 0; --i)
                 {
-                    originalGroupData.filter.Clear();
-                    continue;
-                }
+                    var entityID = otherQuery.egid[indices[i]].entityID;
 
-                var result = indexedDB.Select<IndexableResultSet<TComponent>>().From(table).Entities();
-
-                // ugh I have to check what to delete
-                // since I cannot change filter while iteration
-                // this will be removed when Svelto updates it's filter system
-                FasterList<uint> entityIDsToDelete = new FasterList<uint>();
-
-                foreach (uint i in new IndexedIndices(originalGroupData.filter.filteredIndices))
-                {
-                    ref var component = ref result.set.component[i];
-
-                    if (!queryGroupData.filter.Exists(component.ID.entityID))
-                        entityIDsToDelete.Add(component.ID.entityID);
-                }
-
-                for (int i = 0; i < entityIDsToDelete.count; ++i)
-                {
-                    originalGroupData.filter.TryRemove(entityIDsToDelete[i]);
+                    if (!otherQuery.indices.IndexExists(indices[i]))
+                        groupFilter.Remove(entityID);
                 }
             }
         }
 
-        private IndexerKeyData GetIndexerKeyData(IndexedDB indexedDB)
+        void IIndexQuery.Apply(ResultSetQueryConfig config)
         {
-            if (indexedDB.memos.TryGetValue(_memoID, out var result))
-                return result.keyData;
-            return default;
+            config.filters.Add(GetFilter(config.indexedDB));
         }
-
-        IndexerKeyData IIndexQuery.GetIndexerKeyData(IndexedDB indexedDB)
-            => GetIndexerKeyData(indexedDB);
     }
 }
 
 namespace Svelto.ECS.Schema.Definition
 {
-    public interface IMemorableRow : IIndexableRow<EGIDComponent> { }
+    public sealed class Memo<TRow> : MemoBase<TRow>
+        where TRow : class, IEntityRow
+    { }
 
-    public sealed class Memo<TRow> : MemoBase<TRow, EGIDComponent>
-        where TRow : class, IMemorableRow
+    public sealed class Memo : MemoBase<IEntityRow>
     { }
 }

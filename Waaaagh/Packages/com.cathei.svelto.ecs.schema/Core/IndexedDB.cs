@@ -10,53 +10,82 @@ namespace Svelto.ECS.Schema
     /// <summary>
     /// *Indexed* EntitiesDB
     /// </summary>
-    public sealed partial class IndexedDB
+    public sealed partial class IndexedDB : IStepEngine
     {
-        internal readonly FasterList<SchemaMetadata> registeredSchemas = new FasterList<SchemaMetadata>();
-        internal readonly FasterList<IEntityStateMachine> registeredStateMachines = new FasterList<IEntityStateMachine>();
+        internal readonly FasterList<SchemaMetadata> registeredSchemas = new();
+        internal readonly FasterList<IEntityStateMachine> registeredStateMachines = new();
 
-        // indexer will be created per TComponent
-        internal readonly HashSet<RefWrapperType> createdIndexerEngines = new HashSet<RefWrapperType>();
+        // engines will be created per TComponent
+        internal readonly HashSet<RefWrapperType> createdIndexerEngines = new();
+        internal readonly HashSet<RefWrapperType> createdStateMachineEngines = new();
 
-        internal readonly FasterDictionary<int, IndexerData> indexers = new FasterDictionary<int, IndexerData>();
-        internal readonly FasterDictionary<int, MemoData> memos = new FasterDictionary<int, MemoData>();
+        internal readonly FasterDictionary<uint, IndexerData> indexers = new();
 
-        // well... let's have some space for user defined filter
-        private int filterIdCounter = 10000;
-
+        internal IEntityFunctions entityFunctions;
         internal EntitiesDB entitiesDB;
+
+        private readonly IStepEngine _engine;
+        private readonly FasterList<IStepEngine> enginesList = new();
+
+        internal IndexedDB(EnginesRoot enginesRoot, IEntityFunctions entityFunctions)
+        {
+            this.entityFunctions = entityFunctions;
+
+            var pkEngine = new PrimaryKeyEngine(this);
+            enginesRoot.AddEngine(pkEngine);
+            enginesList.Add(pkEngine);
+
+            _engine = new IndexedDBEngine(this, enginesList);
+            enginesRoot.AddEngine(_engine);
+        }
 
         internal void RegisterSchema(EnginesRoot enginesRoot, SchemaMetadata metadata)
         {
             registeredSchemas.Add(metadata);
 
-            var indexers = metadata.indexersToGenerateEngine;
+            _groupToTable.Union(metadata.groupToTable);
 
-            foreach (var componentType in indexers.keys)
+            foreach (var indexer in metadata.indexers)
             {
+                var componentType = indexer.ComponentType;
+
                 if (createdIndexerEngines.Contains(componentType))
                     continue;
 
                 createdIndexerEngines.Add(componentType);
-                indexers[componentType].AddEngines(enginesRoot, this);
+
+                indexer.AddEngines(enginesRoot, this);
             }
         }
 
         internal void RegisterStateMachine<T>(EnginesRoot enginesRoot, T stateMachine)
             where T : class, IEntityStateMachine
         {
-            registeredStateMachines.Add(stateMachine);
+            var indexer = stateMachine.Index;
 
-            var componentType = stateMachine.Index.ComponentType;
-
-            // we do NOT support multiple instance of same state machine
-            if (!createdIndexerEngines.Contains(componentType))
+            if (!createdIndexerEngines.Contains(indexer.ComponentType))
             {
-                createdIndexerEngines.Add(componentType);
+                createdIndexerEngines.Add(indexer.ComponentType);
+
+                indexer.AddEngines(enginesRoot, this);
+            }
+
+            var componentType = stateMachine.ComponentType;
+
+            if (!createdStateMachineEngines.Contains(componentType))
+            {
+                createdStateMachineEngines.Add(componentType);
+
                 stateMachine.AddEngines(enginesRoot, this);
             }
+
+            registeredStateMachines.Add(stateMachine);
         }
 
         public static implicit operator EntitiesDB(IndexedDB indexedDB) => indexedDB.entitiesDB;
+
+        string IStepEngine.name => _engine.name;
+
+        public void Step() => _engine.Step();
     }
 }

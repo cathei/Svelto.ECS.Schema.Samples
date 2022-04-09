@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Svelto.DataStructures;
+using Svelto.ECS.Internal;
+using Svelto.ECS.Native;
 using Svelto.ECS.Schema.Internal;
 
 namespace Svelto.ECS.Schema
@@ -9,51 +11,55 @@ namespace Svelto.ECS.Schema
     public partial class IndexedDB
     {
         // EGIDMapper is struct, avoid boxing
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal EGIDMapper<RowIdentityComponent> GetEGIDMapper(in ExclusiveGroupStruct groupID)
-        {
-            return entitiesDB.QueryMappedEntities<RowIdentityComponent>(groupID);
-        }
+            => entitiesDB.QueryMappedEntities<RowIdentityComponent>(groupID);
 
-        public bool Exists(IEntityTable table, uint entityID)
-        {
-            return entitiesDB.Exists<RowIdentityComponent>(entityID, table.ExclusiveGroup);
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        internal NativeEGIDMapper<RowIdentityComponent> GetNativeEGIDMapper(in ExclusiveGroupStruct groupID)
+            => entitiesDB.QueryNativeMappedEntities<RowIdentityComponent>(groupID);
 
-        public bool TryGetEGID<TRow>(EntityReference entityReference, out IEntityTable<TRow> table, out uint entityID)
-            where TRow : class, IEntityRow
-        {
-            if (entitiesDB.TryGetEGID(entityReference, out var egid))
-            {
-                table = FindTable<TRow>(egid.groupID);
-                entityID = egid.entityID;
-                return table != null;
-            }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Exists(in EGID egid)
+            => entitiesDB.Exists<RowIdentityComponent>(egid);
 
-            table = null;
-            entityID = default;
-            return false;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool Exists(uint entityID, in ExclusiveGroupStruct groupID)
+            => entitiesDB.Exists<RowIdentityComponent>(entityID, groupID);
 
-        public bool TryGetEntityIndex(IEntityTable table, uint entityID, out uint entityIndex)
+        public bool TryGetEntityIndex(uint entityID, in ExclusiveGroupStruct groupID, out uint entityIndex)
         {
-            var mapper = GetEGIDMapper(table.ExclusiveGroup);
+            var mapper = GetEGIDMapper(groupID);
             return mapper.FindIndex(entityID, out entityIndex);
         }
 
-        public bool TryGetEntityIndex<TRow>(EntityReference entityReference, out IEntityTable<TRow> table, out uint entityIndex)
-            where TRow : class, IEntityRow
+        public bool TryGetEntityIndex(EntityReference entityReference, out uint entityIndex)
         {
-            if (!TryGetEGID(entityReference, out table, out var entityID))
+            if (!TryGetEGID(entityReference, out var egid))
             {
                 entityIndex = default;
                 return false;
             }
 
-            return TryGetEntityIndex(table, entityID, out entityIndex);
+            return TryGetEntityIndex(egid.entityID, egid.groupID, out entityIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public EntityReference GetEntityReference(IEntityTable table, uint entityID)
-            => entitiesDB.GetEntityReference(new EGID(entityID, table.ExclusiveGroup));
+        public bool TryGetEGID(in EntityReference entityReference, out EGID egid)
+            => entitiesDB.TryGetEGID(entityReference, out egid);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public EntityReference GetEntityReference(uint entityID, in ExclusiveGroupStruct groupID)
+            => entitiesDB.GetEntityReference(new EGID(entityID, groupID));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public EntityReference GetEntityReference(in EGID egid)
+            => entitiesDB.GetEntityReference(egid);
+
+        internal NativeEntityIDs QueryEntityIDs(in ExclusiveGroupStruct groupID)
+        {
+            var (_, entityIDs, _) = entitiesDB.QueryEntities<RowIdentityComponent>(groupID);
+            return entityIDs;
+        }
     }
 }

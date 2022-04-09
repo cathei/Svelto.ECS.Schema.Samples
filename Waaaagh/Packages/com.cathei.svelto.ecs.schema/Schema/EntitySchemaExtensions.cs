@@ -47,15 +47,9 @@ namespace Svelto.ECS.Schema
             return schema;
         }
 
-        /// <summary>
-        /// return value is StateMachine that will work as API of state machine related functions
-        /// remember to run StateMachine.Engine to make sure state changes!
-        /// </summary>
         public static T AddStateMachine<T>(this EnginesRoot enginesRoot, IndexedDB indexedDB)
             where T : class, IEntityStateMachine, new()
         {
-            // State machine will work as API
-            // Actual configuration is static variable in StateMachine
             var stateMachine = new T();
 
             indexedDB.RegisterStateMachine(enginesRoot, stateMachine);
@@ -65,10 +59,8 @@ namespace Svelto.ECS.Schema
 
         public static IndexedDB GenerateIndexedDB(this EnginesRoot enginesRoot)
         {
-            var indexedDB = new IndexedDB();
-
-            // SchemaContextEngine injects EntitiesDB to IndexedDB
-            enginesRoot.AddEngine(new IndexedDBEngine(indexedDB));
+            var entityFunctions = enginesRoot.GenerateEntityFunctions();
+            var indexedDB = new IndexedDB(enginesRoot, entityFunctions);
 
             return indexedDB;
         }

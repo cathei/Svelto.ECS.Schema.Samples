@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Svelto.DataStructures;
 using Svelto.ECS.Schema.Definition;
 using Svelto.ECS.Schema.Internal;
@@ -11,48 +12,57 @@ namespace Svelto.ECS.Schema
 
         public interface IEntityTable : ISchemaDefinition
         {
-            string Name { get; set; }
+            ref readonly ExclusiveGroup Group { get; }
+            int GroupRange { get; }
 
-            ref readonly ExclusiveGroupStruct ExclusiveGroup { get; }
+            internal FasterDictionary<int, IEntityPrimaryKey> PrimaryKeys { get; }
+
+            internal EntityInitializer Build(IEntityFactory factory, uint entityID, IEnumerable<object> implementors);
+            internal void Swap(IEntityFunctions functions, in EGID egid, in ExclusiveBuildGroup groupID);
+            internal void Remove(IEntityFunctions functions, in EGID egid);
         }
 
         public interface IEntityIndex : ISchemaDefinition
         {
             RefWrapperType ComponentType { get; }
-            int IndexerID { get; }
+            FilterContextID IndexerID { get; }
+
             void AddEngines(EnginesRoot enginesRoot, IndexedDB indexedDB);
         }
 
-        public interface IEntityTables : ISchemaDefinition
+        public interface IEntityPrimaryKey : ISchemaDefinition
         {
-            string Name { get; set; }
+            int PrimaryKeyID { get; }
+            Delegate KeyToIndex { get; }
+            ushort PossibleKeyCount { get; }
 
-            bool IsCombined { get; }
-            int Range { get; }
-            LocalFasterReadOnlyList<ExclusiveGroupStruct> ExclusiveGroups { get; }
-            IEntityTable GetTable(int index);
+            internal void Ready(EntitiesDB entitiesDB, in ExclusiveGroupStruct groupID);
+            internal int QueryGroupIndex(uint index);
         }
 
-        internal interface ISchemaDefinitionRangedSchema : ISchemaDefinition
+        internal interface IEntityMemo : ISchemaDefinition
         {
-            int Range { get; }
-            IEntitySchema GetSchema(int index);
+            CombinedFilterID FilterID { get; }
         }
 
-        internal interface ISchemaDefinitionMemo : ISchemaDefinition
+        public interface IEntityForeignKey : ISchemaDefinition
         {
-            int MemoID { get; }
+            IEntityIndex Index { get; }
         }
 
         public interface IEntityStateMachine
         {
+            RefWrapperType ComponentType { get; }
             void AddEngines(EnginesRoot enginesRoot, IndexedDB indexedDB);
             IEntityIndex Index { get; }
         }
+
+        public interface IEntityTables
+        {
+            int Range { get; }
+            IEntityTable GetTable(int index);
+        }
     }
 
-    namespace Definition
-    {
-        public interface IEntitySchema : ISchemaDefinition { }
-    }
+    public interface IEntitySchema : ISchemaDefinition { }
 }

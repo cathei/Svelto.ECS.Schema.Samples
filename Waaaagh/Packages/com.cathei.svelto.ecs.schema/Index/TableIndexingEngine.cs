@@ -5,35 +5,37 @@ using Svelto.ECS.Internal;
 
 namespace Svelto.ECS.Schema.Internal
 {
-    // TODO: if apply new filter system, we can remove handling for 'MovedTo' and 'Remove'
-    // but we still need 'Add' to make sure new entities are included in index
-    internal class TableIndexingEngine<TR, TC, TK>
-            : ReactToRowEngine<TR, TC>
-            // : IReactRowAddAndRemove<TR, TC>, IReactRowSwap<TR, TC>
-        where TR : class, IReactiveRow<TC>
-        where TC : unmanaged, IIndexableComponent
-        where TK : unmanaged, IEquatable<TK>
+    internal class TableIndexingEngine<TRow, TComponent> :
+            IReactRowAdd<TRow, TComponent>,
+            IReactRowRemove<TRow, TComponent>
+        where TRow : class, IReactiveRow<TComponent>
+        where TComponent : unmanaged, IKeyComponent
     {
-        public TableIndexingEngine(IndexedDB indexedDB) : base(indexedDB)
-        { }
-
-        private static readonly RefWrapperType ComponentType = TypeRefWrapper<TC>.wrapper;
-
-        protected override void Add(ref TC component, IEntityTable<TR> table, uint entityID)
+        public TableIndexingEngine(IndexedDB indexedDB)
         {
-            indexedDB.UpdateIndexableComponent(ComponentType, component.ID,
-                IndexableComponentHelper<TC>.KeyGetter<TK>.Getter(ref component));
+            this.indexedDB = indexedDB;
         }
 
-        protected override void MovedTo(ref TC component, IEntityTable<TR> previousTable, IEntityTable<TR> table, uint entityID)
+        public IndexedDB indexedDB { get; }
+
+        public void Add(in EntityCollection<TComponent> collection, RangedIndices indices, ExclusiveGroupStruct group)
         {
-            indexedDB.UpdateIndexableComponent(ComponentType, component.ID,
-                IndexableComponentHelper<TC>.KeyGetter<TK>.Getter(ref component));
+            var (component, entityIDs, _) = collection;
+
+            foreach (var i in indices)
+            {
+                KeyComponentHelper<TComponent>.Handler.Update(indexedDB, ref component[i], new(entityIDs[i], group));
+            }
         }
 
-        protected override void Remove(ref TC component, IEntityTable<TR> table, uint entityID)
+        public void Remove(in EntityCollection<TComponent> collection, RangedIndices indices, ExclusiveGroupStruct group)
         {
-            indexedDB.RemoveIndexableComponent<TK>(ComponentType, component.ID);
+            var (identity, _) = indexedDB.entitiesDB.QueryEntities<RowIdentityComponent>(group);
+
+            foreach (var i in indices)
+            {
+                KeyComponentHelper<TComponent>.Handler.Remove(indexedDB, identity[i].selfReference);
+            }
         }
     }
 }

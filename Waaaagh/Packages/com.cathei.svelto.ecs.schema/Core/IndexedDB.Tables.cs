@@ -14,25 +14,16 @@ namespace Svelto.ECS.Schema
         internal readonly FasterDictionary<RefWrapperType, IEntityTables> _rowToTables
             = new FasterDictionary<RefWrapperType, IEntityTables>();
 
+        public IEntityTable FindTable(in ExclusiveGroupStruct groupID)
+        {
+            return _groupToTable[groupID];
+        }
+
         public IEntityTable<TR> FindTable<TR>(in ExclusiveGroupStruct groupID)
             where TR : class, IEntityRow
         {
-            if (!_groupToTable.TryGetValue(groupID, out var table))
-            {
-                foreach (var schemaMetadata in registeredSchemas)
-                {
-                    if (schemaMetadata.groupToTable.TryGetValue(groupID, out var tableNode))
-                    {
-                        table = tableNode.table;
-                        break;
-                    }
-                }
-
-                _groupToTable[groupID] = table;
-            }
-
             // return null if type does not match
-            return table as IEntityTable<TR>;
+            return FindTable(groupID) as IEntityTable<TR>;
         }
 
         /// <summary>
@@ -47,11 +38,9 @@ namespace Svelto.ECS.Schema
 
                 foreach (var schemaMetadata in registeredSchemas)
                 {
-                    var tableNodes = schemaMetadata.groupToTable.GetValues(out var count);
-
-                    for (int i = 0; i < count; ++i)
+                    foreach (var table in schemaMetadata.tables)
                     {
-                        if (tableNodes[i].table is IEntityTable<TR> matchingTable)
+                        if (table is IEntityTable<TR> matchingTable)
                             tablesList.Add(matchingTable);
                     }
                 }

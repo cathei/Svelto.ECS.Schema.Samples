@@ -10,11 +10,9 @@ namespace Cathei.Waaagh
     {
         public NB<DamageComponent> damage;
 
-        public int count { get; set; }
-
         public void Init(in EntityCollection<DamageComponent> buffers)
         {
-            (damage, count) = buffers;
+            (damage, _) = buffers;
         }
     }
 

@@ -12,11 +12,9 @@ namespace Cathei.Waaagh
         public NB<GameObjectComponent> instance;
         public NB<TintComponent> tint;
 
-        public int count { get; set; }
-
         public void Init(in EntityCollection<PositionComponent, GameObjectComponent, TintComponent> buffers)
         {
-            (position, instance, tint, count) = buffers;
+            (position, instance, tint, _) = buffers;
         }
     }
 

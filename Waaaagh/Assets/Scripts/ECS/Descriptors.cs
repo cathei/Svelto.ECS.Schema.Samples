@@ -5,11 +5,17 @@ using Svelto.ECS.Schema.Definition;
 
 namespace Cathei.Waaagh
 {
-    public interface ICharacterRow : IMovableRow, ICanAttackRow, IDamagableRow { }
+    public interface ICharacterRow :
+        IMovableRow, ICanAttackRow, IDamagableRow, IBurnableRow
+    { }
 
-    public interface IProjectileRow : ICanAttackRow { }
+    public interface IProjectileRow :
+        ICanAttackRow
+    { }
 
-    public interface IBuildingRow : IDamagableRow { }
+    public interface IBuildingRow :
+        IDamagableRow, IBurnableRow
+    { }
 
     public interface IOrcsSpawnRow :
         IBuildingRow, ISpawnableRow, IHealthRegenerableRow

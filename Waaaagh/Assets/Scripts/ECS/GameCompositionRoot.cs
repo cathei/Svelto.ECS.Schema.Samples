@@ -28,8 +28,6 @@ namespace Cathei.Waaagh
             var designsDB = gameContext.designsDB;
 
             var entityFactory = _enginesRoot.GenerateEntityFactory();
-            var entityFunctions = _enginesRoot.GenerateEntityFunctions();
-
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
@@ -51,14 +49,13 @@ namespace Cathei.Waaagh
             _enginesRoot.AddEngine(gameObjectSpawnEngine);
             _enginesRoot.AddEngine(gameObjectSyncEngine);
 
-            var tickableEnginesGroup = new TickableEnginesGroup(new FasterList<IStepEngine<float>>(
-                new IStepEngine<float>[]
-                {
-                    applyMovementEngine,
-                    applyDamageEngine,
-                    damageFeedbackEngine,
-                    gameObjectSyncEngine
-                }));
+            var tickableEnginesGroup = new TickableEnginesGroup(indexedDB, new(new IStepEngine<float>[]
+            {
+                applyMovementEngine,
+                applyDamageEngine,
+                damageFeedbackEngine,
+                gameObjectSyncEngine,
+            }));
 
             _enginesRoot.AddEngine(tickableEnginesGroup);
 
@@ -77,6 +74,19 @@ namespace Cathei.Waaagh
 
     public class TickableEnginesGroup : UnsortedEnginesGroup<IStepEngine<float>, float>
     {
-        public TickableEnginesGroup(FasterList<IStepEngine<float>> engines) : base(engines) { }
+        private readonly IndexedDB _indexedDB;
+
+        public TickableEnginesGroup(IndexedDB indexedDB, FasterList<IStepEngine<float>> engines)
+            : base(engines)
+        {
+            _indexedDB = indexedDB;
+        }
+
+        public new void Step(in float deltaTime)
+        {
+            base.Step(deltaTime);
+
+            _indexedDB.Step();
+        }
     }
 }

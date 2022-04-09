@@ -33,8 +33,8 @@ namespace Cathei.Waaagh
 
             var goManager = new GameObjectResourceManager(designsDB);
 
-            var applyMovementEngine = new ApplyMovementEngine(indexedDB, schema);
-            var applyDamageEngine = new ApplyDamageEngine(indexedDB, schema);
+            var applyMovementEngine = new ApplyMovementEngine(indexedDB);
+            var applyDamageEngine = new ApplyDamageEngine(indexedDB);
 
             _enginesRoot.AddEngine(applyMovementEngine);
             _enginesRoot.AddEngine(applyDamageEngine);

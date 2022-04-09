@@ -7,6 +7,7 @@ namespace Cathei.Waaagh
 {
     public struct VelocityComponent : IEntityComponent
     {
-        public Vector3 value;
+        public Vector3 direction;
+        public float speed;
     }
 }

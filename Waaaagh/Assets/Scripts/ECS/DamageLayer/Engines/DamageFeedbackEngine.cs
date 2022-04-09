@@ -10,11 +10,11 @@ namespace Cathei.Waaagh
     public class DamageFeedbackEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
-        private readonly GameSchema _schema;
+        private readonly IDamageSchema _schema;
 
         public string name => nameof(DamageFeedbackEngine);
 
-        public DamageFeedbackEngine(IndexedDB indexedDB, GameSchema schema)
+        public DamageFeedbackEngine(IndexedDB indexedDB, IDamageSchema schema)
         {
             _indexedDB = indexedDB;
             _schema = schema;

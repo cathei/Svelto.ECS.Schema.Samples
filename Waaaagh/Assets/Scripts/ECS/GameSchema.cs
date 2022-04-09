@@ -5,7 +5,7 @@ using Svelto.ECS.Schema.Definition;
 
 namespace Cathei.Waaagh
 {
-    public class GameSchema : IEntitySchema
+    public class GameSchema : IEntitySchema, IDamageSchema, ITargetSchema
     {
         public readonly Table<OrcsRow> Orcs = new();
         public readonly Table<OrcsSpawnRow> OrcsSpawn = new();
@@ -18,6 +18,8 @@ namespace Cathei.Waaagh
 
         public readonly Index<StatusBurnComponent> StatusBurn = new();
 
-        public readonly Memo<IDamagableRow> Damaged = new();
+        public ForeignKey<TargetComponent, ITargetableRow> Targeted { get; } = new();
+
+        public Memo<IDamagableRow> Damaged { get; } = new();
     }
 }

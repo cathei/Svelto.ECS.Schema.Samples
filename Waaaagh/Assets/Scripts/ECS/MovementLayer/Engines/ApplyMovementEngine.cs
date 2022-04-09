@@ -9,14 +9,12 @@ namespace Cathei.Waaagh
     public class ApplyMovementEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
-        private readonly GameSchema _schema;
 
         public string name => nameof(ApplyMovementEngine);
 
-        public ApplyMovementEngine(IndexedDB indexedDB, GameSchema schema)
+        public ApplyMovementEngine(IndexedDB indexedDB)
         {
             _indexedDB = indexedDB;
-            _schema = schema;
         }
 
         public void Step(in float deltaTime)
@@ -28,7 +26,7 @@ namespace Cathei.Waaagh
                     ref var position = ref result.set.position[i];
                     ref var velocity = ref result.set.velocity[i];
 
-                    position.value += velocity.value * deltaTime;
+                    position.value += velocity.direction * velocity.speed * deltaTime;
                 }
             }
         }

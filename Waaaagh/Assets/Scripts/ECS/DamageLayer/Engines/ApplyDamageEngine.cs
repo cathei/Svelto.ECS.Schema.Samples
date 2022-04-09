@@ -9,14 +9,12 @@ namespace Cathei.Waaagh
     public class ApplyDamageEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
-        private readonly GameSchema _schema;
 
         public string name => nameof(ApplyDamageEngine);
 
-        public ApplyDamageEngine(IndexedDB indexedDB, GameSchema schema)
+        public ApplyDamageEngine(IndexedDB indexedDB)
         {
             _indexedDB = indexedDB;
-            _schema = schema;
         }
 
         public void Step(in float deltaTime)

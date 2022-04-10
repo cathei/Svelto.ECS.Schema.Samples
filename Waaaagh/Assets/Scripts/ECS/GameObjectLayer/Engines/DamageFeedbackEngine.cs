@@ -10,11 +10,11 @@ namespace Cathei.Waaagh
     internal class DamageFeedbackEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
-        private readonly IWhereQuery<IGameObjectRow> _damagedEntities;
+        private readonly IEntityMemo<IGameObjectRow> _damagedEntities;
 
         public string name => nameof(DamageFeedbackEngine);
 
-        public DamageFeedbackEngine(IndexedDB indexedDB, IWhereQuery<IGameObjectRow> damagedEntities)
+        public DamageFeedbackEngine(IndexedDB indexedDB, IEntityMemo<IGameObjectRow> damagedEntities)
         {
             _indexedDB = indexedDB;
             _damagedEntities = damagedEntities;

@@ -14,6 +14,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   prefabInfos:
   - prefabID: 0
-    prefab: {fileID: 0}
-  - prefabID: 1
-    prefab: {fileID: 0}
+    prefab: {fileID: 3683602561263397046, guid: 553e8f14ebcb2459485b40c0692c2e82, type: 3}
+  - prefabID: 100
+    prefab: {fileID: 3683602561263397046, guid: 934a30dfc0a964d16a3b4ef962299f07, type: 3}

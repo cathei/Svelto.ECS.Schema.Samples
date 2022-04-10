@@ -17,18 +17,7 @@ namespace Cathei.Waaagh
         }
     }
 
-    public struct DamageFeedbackSet : IResultSet<TintComponent>
-    {
-        public NB<TintComponent> tint;
-
-        public void Init(in EntityCollection<TintComponent> buffers)
-        {
-            (tint, _) = buffers;
-        }
-    }
-
     public interface IDamagableRow :
-        IQueryableRow<DamagableSet>,
-        IQueryableRow<DamageFeedbackSet>
+        IQueryableRow<DamagableSet>
     { }
 }

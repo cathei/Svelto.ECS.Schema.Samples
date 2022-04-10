@@ -7,7 +7,7 @@ using Svelto.ECS.Schema.Internal;
 
 namespace Cathei.Waaagh
 {
-    public class GameObjectSpawnEngine :
+    internal class GameObjectSpawnEngine :
         IReactRowAdd<IGameObjectRow, GameObjectComponent>,
         IReactRowRemove<IGameObjectRow, GameObjectComponent>
     {

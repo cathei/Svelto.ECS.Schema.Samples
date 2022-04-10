@@ -7,31 +7,29 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    public class DamageFeedbackEngine : IStepEngine<float>
+    internal class DamageFeedbackEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
-        private readonly IDamageSchema _schema;
+        private readonly IWhereQuery<IGameObjectRow> _damagedEntities;
 
         public string name => nameof(DamageFeedbackEngine);
 
-        public DamageFeedbackEngine(IndexedDB indexedDB, IDamageSchema schema)
+        public DamageFeedbackEngine(IndexedDB indexedDB, IWhereQuery<IGameObjectRow> damagedEntities)
         {
             _indexedDB = indexedDB;
-            _schema = schema;
+            _damagedEntities = damagedEntities;
         }
 
         public void Step(in float deltaTime)
         {
             foreach (var result in _indexedDB
-                .Select<DamageFeedbackSet>().FromAll<IDamagableRow>().Where(_schema.Damaged))
+                .Select<DamageFeedbackSet>().FromAll<IGameObjectRow>().Where(_damagedEntities))
             {
                 foreach (var i in result.indices)
                 {
                     result.set.tint[i].value = Color.red;
                 }
             }
-
-            _indexedDB.Memo(_schema.Damaged).Clear();
         }
     }
 }

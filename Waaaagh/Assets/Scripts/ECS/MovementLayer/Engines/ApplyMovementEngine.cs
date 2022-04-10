@@ -6,7 +6,7 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public class ApplyMovementEngine : IStepEngine<float>
+    internal class ApplyMovementEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
 

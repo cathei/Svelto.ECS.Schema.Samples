@@ -7,23 +7,23 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    public class TargetAimingEngine : IStepEngine<float>
+    internal class TargetAimingEngine : IStepEngine<float>
     {
         private readonly IndexedDB _indexedDB;
-        private readonly ITargetSchema _schema;
+        private readonly IForeignKey<TargetComponent, ITargetableRow> _targeted;
 
-        public string name => nameof(ApplyMovementEngine);
+        public string name => nameof(TargetAimingEngine);
 
-        public TargetAimingEngine(IndexedDB indexedDB, ITargetSchema schema)
+        public TargetAimingEngine(IndexedDB indexedDB, IForeignKey<TargetComponent, ITargetableRow> targeted)
         {
             _indexedDB = indexedDB;
-            _schema = schema;
+            _targeted = targeted;
         }
 
         public void Step(in float deltaTime)
         {
             foreach (var result in _indexedDB.Select<CanTargetSet>().FromAll<ICanTargetRow>()
-                                            .Join<TargetableSet>().On(_schema.Targeted))
+                                            .Join<TargetableSet>().On(_targeted))
             {
                 foreach (var (ia, ib) in result.indices)
                 {

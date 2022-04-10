@@ -15,7 +15,7 @@ namespace Cathei.Waaagh
         private readonly GameObject _rootActive;
         private readonly GameObject _rootInactive;
 
-        private readonly Dictionary<Constants.PrefabID, GameObject> _prefabs;
+        private readonly Dictionary<PrefabID, GameObject> _prefabs;
         private readonly FasterDictionary<uint, EcsBridgeComponent> _idToInstances = new();
 
         private uint _nextInstanceID;
@@ -31,7 +31,7 @@ namespace Cathei.Waaagh
             _pool = new GameObjectPool();
         }
 
-        public uint Create(Constants.PrefabID prefabID)
+        public uint Create(PrefabID prefabID)
         {
             uint id = _nextInstanceID++;
 
@@ -43,7 +43,7 @@ namespace Cathei.Waaagh
             return id;
         }
 
-        private Func<GameObject> SpawnNewGameObject(Constants.PrefabID prefabID)
+        private Func<GameObject> SpawnNewGameObject(PrefabID prefabID)
         {
             return () => {
                 var go = GameObject.Instantiate(_prefabs[prefabID]);
@@ -57,7 +57,7 @@ namespace Cathei.Waaagh
             return _idToInstances[instanceID];
         }
 
-        public void Return(Constants.PrefabID prefabID, uint instanceID)
+        public void Return(PrefabID prefabID, uint instanceID)
         {
             var bridge = _idToInstances[instanceID];
 

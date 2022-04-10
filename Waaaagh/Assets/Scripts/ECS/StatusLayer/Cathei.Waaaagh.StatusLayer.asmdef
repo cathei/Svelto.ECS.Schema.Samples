@@ -1,0 +1,19 @@
+{
+    "name": "Cathei.Waaaagh.StatusLayer",
+    "rootNamespace": "",
+    "references": [
+        "Svelto.Common",
+        "Svelto.ECS",
+        "Svelto.ECS.Schema",
+        "Cathei.Waaaagh.DamageLayer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

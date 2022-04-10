@@ -1,0 +1,20 @@
+{
+    "name": "Cathei.Waaaagh.GameObjectLayer",
+    "rootNamespace": "",
+    "references": [
+        "Svelto.Common",
+        "Svelto.ECS",
+        "Svelto.ECS.Schema",
+        "Cathei.Waaaagh.Design",
+        "Cathei.Waaaagh.MovementLayer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

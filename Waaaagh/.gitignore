@@ -1,3 +1,6 @@
+# Project specific settings
+Recordings/
+
 # This .gitignore file should be placed at the root of your Unity project directory
 #
 # Get latest from https://github.com/github/gitignore/blob/master/Unity.gitignore
@@ -66,11 +69,3 @@ sysinfo.txt
 
 # Crashlytics generated file
 crashlytics-build.properties
-
-# Visual studio code setting files
-.vscode/*
-!.vscode/shared.code-snippets
-
-Assets/I2/Localization/Scripts/Editor/Targets.meta
-Assets/Texture/Mask/PreviewEnemy/Temp.meta
-Recordings/

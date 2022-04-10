@@ -6,6 +6,7 @@ using Svelto.ECS;
 using Svelto.ECS.Schedulers;
 using Svelto.ECS.Schema;
 using Svelto.ECS.Schema.Definition;
+using UnityEngine;
 
 namespace Cathei.Waaagh
 {
@@ -14,7 +15,7 @@ namespace Cathei.Waaagh
         private SimpleEntitiesSubmissionScheduler _simpleSubmitScheduler;
         private EnginesRoot _enginesRoot;
 
-        private FasterList<ITickEngine> _tickableEngines;
+        private FasterList<ITickEngine> _tickEngines;
 
         private GameLoop _gameLoop;
 
@@ -33,7 +34,7 @@ namespace Cathei.Waaagh
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
-            _tickableEngines = new FasterList<ITickEngine>();
+            _tickEngines = new FasterList<ITickEngine>();
 
             TargetingLayerComposition.Compose(AddEngine, indexedDB, schema.Targeted);
             MovementLayerComposition.Compose(AddEngine, indexedDB);
@@ -42,9 +43,13 @@ namespace Cathei.Waaagh
             SpawningLayerComposition.Compose(AddEngine, indexedDB);
             GameObjectLayerComposition.Compose(AddEngine, indexedDB, designsDB, schema.Damaged);
 
-            var tickableEnginesGroup = new TickEnginesGroup(indexedDB, _tickableEngines);
+            _tickEngines.Add(new StepEngineAsTickEngine(indexedDB));
+
+            var tickableEnginesGroup = new TickEnginesGroup(_tickEngines);
 
             _enginesRoot.AddEngine(tickableEnginesGroup);
+
+            BuildInitialEntities(entityFactory, schema);
 
             _gameLoop = GameLoop.Create(_simpleSubmitScheduler, tickableEnginesGroup);
         }
@@ -54,7 +59,7 @@ namespace Cathei.Waaagh
             _enginesRoot.AddEngine(engine);
 
             if (engine is ITickEngine tickEngine)
-                _tickableEngines.Add(tickEngine);
+                _tickEngines.Add(tickEngine);
         }
 
         public void OnContextDestroyed(bool hasBeenInitialised)
@@ -65,24 +70,50 @@ namespace Cathei.Waaagh
                 _enginesRoot.Dispose();
             }
         }
+
+        private Vector3 GetRandomPosition()
+        {
+            return new(
+                UnityEngine.Random.Range(-5f, 5f),
+                UnityEngine.Random.Range(-5f, 5f),
+                0);
+        }
+
+        private void BuildInitialEntities(IEntityFactory factory, GameSchema schema)
+        {
+            for (uint i = 0; i < 100; ++i)
+            {
+                var builder = factory.Build(schema.Guardman, i);
+                builder.Init(new PositionComponent(GetRandomPosition()));
+            }
+
+            for (uint i = 0; i < 100; ++i)
+            {
+                var builder = factory.Build(schema.Orcs, i);
+                builder.Init(new PositionComponent(GetRandomPosition()));
+            }
+        }
     }
 
+    public class StepEngineAsTickEngine : ITickEngine
+    {
+        private readonly IStepEngine _engine;
+
+        public StepEngineAsTickEngine(IStepEngine engine)
+        {
+            _engine = engine;
+        }
+
+        public string name => _engine.name;
+
+        public void Step(in float _param)
+        {
+            _engine.Step();
+        }
+    }
 
     public class TickEnginesGroup : UnsortedEnginesGroup<ITickEngine, float>
     {
-        private readonly IndexedDB _indexedDB;
-
-        public TickEnginesGroup(IndexedDB indexedDB, FasterList<ITickEngine> engines)
-            : base(engines)
-        {
-            _indexedDB = indexedDB;
-        }
-
-        public new void Step(in float deltaTime)
-        {
-            base.Step(deltaTime);
-
-            _indexedDB.Step();
-        }
+        public TickEnginesGroup(FasterList<ITickEngine> engines) : base(engines) { }
     }
 }

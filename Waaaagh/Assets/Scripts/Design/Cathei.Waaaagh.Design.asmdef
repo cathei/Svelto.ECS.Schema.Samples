@@ -1,7 +1,9 @@
 {
     "name": "Cathei.Waaaagh.Design",
     "rootNamespace": "",
-    "references": [],
+    "references": [
+        "GUID:1ce8a05c5b3e041abb5ea01283f2b7fb"
+    ],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

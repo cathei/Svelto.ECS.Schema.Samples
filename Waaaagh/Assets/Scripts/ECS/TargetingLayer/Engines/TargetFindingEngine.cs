@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    internal class TargetFindingEngine : IStepEngine<float>
+    internal class TargetFindingEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
 

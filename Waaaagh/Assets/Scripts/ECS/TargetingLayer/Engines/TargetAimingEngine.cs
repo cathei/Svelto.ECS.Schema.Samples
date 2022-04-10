@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    internal class TargetAimingEngine : IStepEngine<float>
+    internal class TargetAimingEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
         private readonly IForeignKey<TargetComponent, ITargetableRow> _targeted;

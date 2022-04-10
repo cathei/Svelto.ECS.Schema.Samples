@@ -20,6 +20,6 @@ namespace Cathei.Waaagh
 
         public readonly ForeignKey<TargetComponent, ITargetableRow> Targeted = new();
 
-        public readonly Memo<IDamagableRow> Damaged = new();
+        public readonly Memo<IDamagableGameObjectRow> Damaged = new();
     }
 }

@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    internal class DamageFeedbackEngine : IStepEngine<float>
+    internal class DamageFeedbackEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
         private readonly IWhereQuery<IGameObjectRow> _damagedEntities;

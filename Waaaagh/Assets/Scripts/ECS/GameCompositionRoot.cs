@@ -14,6 +14,8 @@ namespace Cathei.Waaagh
         private SimpleEntitiesSubmissionScheduler _simpleSubmitScheduler;
         private EnginesRoot _enginesRoot;
 
+        private FasterList<ITickEngine> _tickableEngines;
+
         private GameLoop _gameLoop;
 
         public void OnContextCreated<T>(T contextHolder)
@@ -31,35 +33,28 @@ namespace Cathei.Waaagh
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
-            var goManager = new GameObjectResourceManager(designsDB);
+            _tickableEngines = new FasterList<ITickEngine>();
 
-            var applyMovementEngine = new ApplyMovementEngine(indexedDB);
-            var applyDamageEngine = new ApplyDamageEngine(indexedDB);
+            TargetingLayerComposition.Compose(AddEngine, indexedDB, schema.Targeted);
+            MovementLayerComposition.Compose(AddEngine, indexedDB);
+            DamageLayerComposition.Compose(AddEngine, indexedDB, schema.Damaged);
+            StatusLayerComposition.Compose(AddEngine, indexedDB);
+            SpawningLayerComposition.Compose(AddEngine, indexedDB);
+            GameObjectLayerComposition.Compose(AddEngine, indexedDB, designsDB, schema.Damaged);
 
-            _enginesRoot.AddEngine(applyMovementEngine);
-            _enginesRoot.AddEngine(applyDamageEngine);
-
-            var damageFeedbackEngine = new DamageFeedbackEngine(indexedDB, schema);
-
-            _enginesRoot.AddEngine(damageFeedbackEngine);
-
-            var gameObjectSpawnEngine = new GameObjectSpawnEngine(indexedDB, goManager);
-            var gameObjectSyncEngine = new GameObjectSyncEngine(indexedDB, goManager);
-
-            _enginesRoot.AddEngine(gameObjectSpawnEngine);
-            _enginesRoot.AddEngine(gameObjectSyncEngine);
-
-            var tickableEnginesGroup = new TickableEnginesGroup(indexedDB, new(new IStepEngine<float>[]
-            {
-                applyMovementEngine,
-                applyDamageEngine,
-                damageFeedbackEngine,
-                gameObjectSyncEngine,
-            }));
+            var tickableEnginesGroup = new TickEnginesGroup(indexedDB, _tickableEngines);
 
             _enginesRoot.AddEngine(tickableEnginesGroup);
 
             _gameLoop = GameLoop.Create(_simpleSubmitScheduler, tickableEnginesGroup);
+        }
+
+        private void AddEngine(IEngine engine)
+        {
+            _enginesRoot.AddEngine(engine);
+
+            if (engine is ITickEngine tickEngine)
+                _tickableEngines.Add(tickEngine);
         }
 
         public void OnContextDestroyed(bool hasBeenInitialised)
@@ -72,11 +67,12 @@ namespace Cathei.Waaagh
         }
     }
 
-    public class TickableEnginesGroup : UnsortedEnginesGroup<IStepEngine<float>, float>
+
+    public class TickEnginesGroup : UnsortedEnginesGroup<ITickEngine, float>
     {
         private readonly IndexedDB _indexedDB;
 
-        public TickableEnginesGroup(IndexedDB indexedDB, FasterList<IStepEngine<float>> engines)
+        public TickEnginesGroup(IndexedDB indexedDB, FasterList<ITickEngine> engines)
             : base(engines)
         {
             _indexedDB = indexedDB;

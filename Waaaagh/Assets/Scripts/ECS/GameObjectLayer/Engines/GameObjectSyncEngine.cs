@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    internal class GameObjectSyncEngine : IStepEngine<float>
+    internal class GameObjectSyncEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
         private readonly GameObjectResourceManager _goManager;

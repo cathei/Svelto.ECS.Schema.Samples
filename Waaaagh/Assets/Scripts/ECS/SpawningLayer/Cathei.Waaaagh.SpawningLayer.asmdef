@@ -4,7 +4,8 @@
     "references": [
         "Svelto.Common",
         "Svelto.ECS",
-        "Svelto.ECS.Schema"
+        "Svelto.ECS.Schema",
+        "Cathei.Waaaagh.Design"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

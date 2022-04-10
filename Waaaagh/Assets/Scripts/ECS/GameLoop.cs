@@ -11,12 +11,12 @@ namespace Cathei.Waaagh
     public class GameLoop : MonoBehaviour, IDisposable
     {
         private SimpleEntitiesSubmissionScheduler _submissionScheduler;
-        private TickableEnginesGroup _tickables;
+        private TickEnginesGroup _tickEngines;
 
         public void Update()
         {
             _submissionScheduler.SubmitEntities();
-            _tickables.Step(Time.deltaTime);
+            _tickEngines.Step(Time.deltaTime);
         }
 
         public void Dispose()
@@ -25,14 +25,14 @@ namespace Cathei.Waaagh
         }
 
         public static GameLoop Create(
-            SimpleEntitiesSubmissionScheduler submissionScheduler, TickableEnginesGroup tickables)
+            SimpleEntitiesSubmissionScheduler submissionScheduler, TickEnginesGroup tickEngines)
         {
             var gameObject = new GameObject("GameLoop");
             DontDestroyOnLoad(gameObject);
 
             var gameLoop = gameObject.AddComponent<GameLoop>();
             gameLoop._submissionScheduler = submissionScheduler;
-            gameLoop._tickables = tickables;
+            gameLoop._tickEngines = tickEngines;
 
             return gameLoop;
         }

@@ -5,6 +5,8 @@ using Svelto.ECS.Schema.Definition;
 
 namespace Cathei.Waaagh
 {
+    public interface IDamagableGameObjectRow : IDamagableRow, IGameObjectRow { }
+
     public interface ICharacterRow :
         IMovableRow, ICanAttackRow, IDamagableRow, IBurnableRow
     { }

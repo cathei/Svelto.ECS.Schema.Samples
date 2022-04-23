@@ -46,6 +46,7 @@ namespace Cathei.Waaagh
             SpawningLayerComposition.Compose(AddEngine, indexedDB);
             GameObjectLayerComposition.Compose(AddEngine, indexedDB, goManager, schema.Damaged);
 
+            // indexedDB as IStepEngine - it is primary key engine
             _tickEngines.Add(new StepEngineAsTickEngine(indexedDB));
 
             var tickableEnginesGroup = new TickEnginesGroup(_tickEngines);
@@ -86,8 +87,9 @@ namespace Cathei.Waaagh
         {
             for (uint i = 0; i < 100; ++i)
             {
-                var builder = factory.Build(schema.Guardman, i);
+                var builder = factory.Build(schema.Human, i);
                 builder.Init(new PositionComponent(GetRandomPosition(designsDB)));
+                builder.Init(new ClassComponent(ClassID.Guardman));
             }
 
             for (uint i = 0; i < 100; ++i)

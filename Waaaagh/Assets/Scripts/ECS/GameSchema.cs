@@ -8,31 +8,33 @@ namespace Cathei.Waaagh
 {
     public class GameSchema : IEntitySchema
     {
+        public readonly Table<HumanRow> Human = new();
+        public readonly Table<ArrowRow> Arrow = new();
+
         public readonly Table<OrcsRow> Orcs = new();
         public readonly Table<OrcsSpawnRow> OrcsSpawn = new();
 
-        public readonly Table<HumanRow> Guardman = new();
-        public readonly Table<HumanRow> Archer = new();
-        public readonly Table<HumanRow> Mage = new();
-
-        public readonly Table<ArrowRow> Arrow = new();
-
         public readonly Index<StatusBurnComponent> StatusBurn = new();
+
+        public readonly PrimaryKey<ClassComponent> Class = new();
 
         public readonly ForeignKey<TargetComponent, ITargetableRow> Targeted = new();
 
-        public readonly Memo<IDamagableGameObjectRow> Damaged = new();
-
-        public readonly CombinedTables<ICharacterRow> Characters;
+        public readonly Memo<IUnitRow> Damaged = new();
 
         public GameSchema()
         {
-            Guardman.SetDefault(new GameObjectComponent(PrefabID.Guardman));
-            Archer.SetDefault(new GameObjectComponent(PrefabID.Archer));
-            Mage.SetDefault(new GameObjectComponent(PrefabID.Mage));
+            Human.SetDefault(new GameObjectComponent(PrefabID.Human));
+            Human.SetDefault(new TeamComponent(TeamID.Human));
 
             Orcs.SetDefault(new GameObjectComponent(PrefabID.Orcs));
+            Orcs.SetDefault(new TeamComponent(TeamID.Orcs));
+
             OrcsSpawn.SetDefault(new GameObjectComponent(PrefabID.OrcsSpawn));
+            OrcsSpawn.SetDefault(new TeamComponent(TeamID.Orcs));
+
+            Human.AddPrimaryKeys(Class);
+            Class.SetPossibleKeys(ClassID.Guardman, ClassID.Archer, ClassID.Mage);
         }
     }
 }

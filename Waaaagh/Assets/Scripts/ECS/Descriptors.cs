@@ -5,20 +5,20 @@ using Svelto.ECS.Schema.Definition;
 
 namespace Cathei.Waaagh
 {
-    public interface IDamagableGameObjectRow :
-        IDamagableRow, IGameObjectRow, IPhysicsRow
-    { }
-
-    public interface ICharacterRow :
-        IDamagableGameObjectRow, IMovableRow, ICanAttackRow, IBurnableRow
+    public interface IUnitRow :
+        IDamagableRow, IGameObjectRow, IPhysicsRow, ITargeterRow, ITargetableRow
     { }
 
     public interface IProjectileRow :
-        IGameObjectRow, ICanAttackRow
+        IGameObjectRow, IPhysicsRow, ICanAttackRow
+    { }
+
+    public interface ICharacterRow :
+        IUnitRow, IMovableRow, ICanAttackRow, IBurnableRow
     { }
 
     public interface IBuildingRow :
-        IDamagableGameObjectRow, IBurnableRow
+        IUnitRow, IBurnableRow
     { }
 
     public interface IOrcsSpawnRow :
@@ -28,6 +28,6 @@ namespace Cathei.Waaagh
     public sealed class OrcsRow : DescriptorRow<OrcsRow>, ICharacterRow { }
     public sealed class OrcsSpawnRow : DescriptorRow<OrcsSpawnRow>, IOrcsSpawnRow { }
 
-    public sealed class HumanRow : DescriptorRow<HumanRow>, ICharacterRow { }
+    public sealed class HumanRow : DescriptorRow<HumanRow>, ICharacterRow, IPrimaryKeyRow<ClassComponent> { }
     public sealed class ArrowRow : DescriptorRow<ArrowRow>, IProjectileRow { }
 }

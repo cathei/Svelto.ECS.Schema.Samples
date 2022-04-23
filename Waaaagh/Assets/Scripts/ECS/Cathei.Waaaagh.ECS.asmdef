@@ -1,0 +1,27 @@
+{
+    "name": "Cathei.Waaaagh.ECS",
+    "rootNamespace": "",
+    "references": [
+        "Svelto.Common",
+        "Svelto.ECS",
+        "Svelto.ECS.Schema",
+        "Cathei.Waaaagh.Design",
+        "Cathei.Waaaagh.Common",
+        "Cathei.Waaaagh.DamageLayer",
+        "Cathei.Waaaagh.GameObjectLayer",
+        "Cathei.Waaaagh.MovementLayer",
+        "Cathei.Waaaagh.SpawningLayer",
+        "Cathei.Waaaagh.StatusLayer",
+        "Cathei.Waaaagh.TargetingLayer",
+        "Cathei.Waaaagh.PhysicsLayer"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

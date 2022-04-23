@@ -6,9 +6,7 @@ namespace Cathei.Waaagh
 {
     public enum PrefabID : uint
     {
-        Guardman = 0,
-        Archer = 1,
-        Mage = 2,
+        Human = 0,
 
         Orcs = 100,
         OrcsSpawn = 101,

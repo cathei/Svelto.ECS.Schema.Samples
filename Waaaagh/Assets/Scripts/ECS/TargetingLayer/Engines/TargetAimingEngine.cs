@@ -35,6 +35,7 @@ namespace Cathei.Waaagh
 
                     var positionDiff = targetablePosition.value - targeterPosition.value;
                     targeterVelocity.direction = positionDiff.normalized;
+                    targeterVelocity.speed = 1f;
                     targeterTarget.cachedDistSqr = positionDiff.sqrMagnitude;
                 }
             }

@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Cathei.Waaagh
 {
-    public class GameObjectResourceManager : IDisposable
+    public class GameObjectManager : IDisposable
     {
         private readonly GameObjectPool _pool;
 
@@ -20,7 +20,7 @@ namespace Cathei.Waaagh
 
         private uint _nextInstanceID;
 
-        public GameObjectResourceManager(DesignsDB designsDB)
+        public GameObjectManager(DesignsDB designsDB)
         {
             _prefabs = designsDB.prefabInfos.ToDictionary(x => x.prefabID, x => x.prefab);
 

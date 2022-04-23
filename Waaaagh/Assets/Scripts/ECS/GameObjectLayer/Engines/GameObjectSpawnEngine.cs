@@ -11,9 +11,9 @@ namespace Cathei.Waaagh
         IReactRowAdd<IGameObjectRow, GameObjectComponent>,
         IReactRowRemove<IGameObjectRow, GameObjectComponent>
     {
-        private readonly GameObjectResourceManager _goManager;
+        private readonly GameObjectManager _goManager;
 
-        public GameObjectSpawnEngine(IndexedDB indexedDB, GameObjectResourceManager goManager)
+        public GameObjectSpawnEngine(IndexedDB indexedDB, GameObjectManager goManager)
         {
             this.indexedDB = indexedDB;
             _goManager = goManager;

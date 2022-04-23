@@ -12,7 +12,7 @@ namespace Cathei.Waaagh
     public static class PhysicsLayerComposition
     {
         public static void Compose(Action<IEngine> addEngine, IndexedDB indexedDB,
-            GameObjectResourceManager goManager)
+            GameObjectManager goManager)
         {
             addEngine(new PhysicsSyncEngine(indexedDB, goManager));
         }

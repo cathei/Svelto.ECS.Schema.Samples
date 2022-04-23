@@ -10,11 +10,11 @@ namespace Cathei.Waaagh
     internal class GameObjectSyncEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
-        private readonly GameObjectResourceManager _goManager;
+        private readonly GameObjectManager _goManager;
 
         public string name => nameof(GameObjectSyncEngine);
 
-        public GameObjectSyncEngine(IndexedDB indexedDB, GameObjectResourceManager goManager)
+        public GameObjectSyncEngine(IndexedDB indexedDB, GameObjectManager goManager)
         {
             _indexedDB = indexedDB;
             _goManager = goManager;

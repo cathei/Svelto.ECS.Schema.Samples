@@ -10,22 +10,29 @@ namespace Cathei.Waaagh
     internal class PhysicsSyncEngine : ITickEngine
     {
         private readonly IndexedDB _indexedDB;
-        private readonly GameObjectResourceManager _goManager;
+        private readonly GameObjectManager _goManager;
 
         public string name => nameof(PhysicsSyncEngine);
 
-        public PhysicsSyncEngine(IndexedDB indexedDB, GameObjectResourceManager goManager)
+        public PhysicsSyncEngine(IndexedDB indexedDB, GameObjectManager goManager)
         {
             _indexedDB = indexedDB;
             _goManager = goManager;
         }
 
-        public IndexedDB indexedDB { get; }
-
         public void Step(in float deltaTime)
         {
+            foreach (var result in _indexedDB.Select<PhysicsSyncSet>().FromAll())
+            {
+                foreach (var i in result.indices)
+                {
+                    ref var go = ref result.set.gameObject[i];
+                    ref var position = ref result.set.position[i];
 
+                    var bridge = _goManager.Get(go.instanceID);
+                    position.value = bridge.transform.position;
+                }
+            }
         }
-
     }
 }

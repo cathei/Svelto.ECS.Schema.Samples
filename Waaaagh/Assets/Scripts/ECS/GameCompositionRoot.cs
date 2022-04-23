@@ -34,7 +34,7 @@ namespace Cathei.Waaagh
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
-            var goManager = new GameObjectResourceManager(designsDB);
+            var goManager = new GameObjectManager(designsDB);
 
             _tickEngines = new FasterList<ITickEngine>();
 

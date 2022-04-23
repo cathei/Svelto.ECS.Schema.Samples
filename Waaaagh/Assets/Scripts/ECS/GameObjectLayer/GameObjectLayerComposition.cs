@@ -11,10 +11,9 @@ namespace Cathei.Waaagh
 {
     public static class GameObjectLayerComposition
     {
-        public static void Compose(Action<IEngine> addEngine, IndexedDB indexedDB, DesignsDB designsDB, IEntityMemo<IGameObjectRow> damaged)
+        public static void Compose(Action<IEngine> addEngine, IndexedDB indexedDB,
+            GameObjectResourceManager goManager, IEntityMemo<IGameObjectRow> damaged)
         {
-            var goManager = new GameObjectResourceManager(designsDB);
-
             addEngine(new DamageFeedbackEngine(indexedDB, damaged));
             addEngine(new GameObjectSpawnEngine(indexedDB, goManager));
             addEngine(new GameObjectSyncEngine(indexedDB, goManager));

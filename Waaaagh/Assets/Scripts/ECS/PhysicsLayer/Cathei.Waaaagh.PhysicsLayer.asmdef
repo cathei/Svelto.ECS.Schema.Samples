@@ -1,11 +1,10 @@
 {
-    "name": "Cathei.Waaaagh.GameObjectLayer",
+    "name": "Cathei.Waaaagh.PhysicsLayer",
     "rootNamespace": "",
     "references": [
         "Svelto.Common",
         "Svelto.ECS",
         "Svelto.ECS.Schema",
-        "Cathei.Waaaagh.Design",
         "Cathei.Waaaagh.Common"
     ],
     "includePlatforms": [],

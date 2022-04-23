@@ -5,8 +5,7 @@
         "Svelto.Common",
         "Svelto.ECS",
         "Svelto.ECS.Schema",
-        "Cathei.Waaaagh.Design",
-        "Cathei.Waaaagh.MovementLayer"
+        "Cathei.Waaaagh.Common"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

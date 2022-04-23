@@ -5,8 +5,7 @@
         "Svelto.Common",
         "Svelto.ECS",
         "Svelto.ECS.Schema",
-        "Cathei.Waaaagh.DamageLayer",
-        "Cathei.Waaaagh.Design"
+        "Cathei.Waaaagh.Common"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

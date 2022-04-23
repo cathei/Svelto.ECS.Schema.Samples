@@ -34,14 +34,17 @@ namespace Cathei.Waaagh
             var indexedDB = _enginesRoot.GenerateIndexedDB();
             var schema = _enginesRoot.AddSchema<GameSchema>(indexedDB);
 
+            var goManager = new GameObjectResourceManager(designsDB);
+
             _tickEngines = new FasterList<ITickEngine>();
 
+            PhysicsLayerComposition.Compose(AddEngine, indexedDB, goManager);
             TargetingLayerComposition.Compose(AddEngine, indexedDB, schema.Targeted);
             MovementLayerComposition.Compose(AddEngine, indexedDB);
             DamageLayerComposition.Compose(AddEngine, indexedDB, schema.Damaged);
             StatusLayerComposition.Compose(AddEngine, indexedDB);
             SpawningLayerComposition.Compose(AddEngine, indexedDB);
-            GameObjectLayerComposition.Compose(AddEngine, indexedDB, designsDB, schema.Damaged);
+            GameObjectLayerComposition.Compose(AddEngine, indexedDB, goManager, schema.Damaged);
 
             _tickEngines.Add(new StepEngineAsTickEngine(indexedDB));
 

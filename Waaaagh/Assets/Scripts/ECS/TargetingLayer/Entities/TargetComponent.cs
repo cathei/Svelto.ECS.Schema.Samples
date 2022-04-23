@@ -9,5 +9,6 @@ namespace Cathei.Waaagh
     public struct TargetComponent : IForeignKeyComponent
     {
         public EntityReference reference { get; set; }
+        public float cachedDistSqr;
     }
 }

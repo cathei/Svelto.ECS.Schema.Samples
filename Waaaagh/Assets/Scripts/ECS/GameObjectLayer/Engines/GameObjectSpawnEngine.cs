@@ -29,6 +29,7 @@ namespace Cathei.Waaagh
             foreach (var i in indices)
             {
                 var bridge = _goManager.Create(ref instance[i]);
+                bridge.transform.position = initSet.position[i].value;
                 initSet.tint[i].value = bridge.originalColor;
             }
         }

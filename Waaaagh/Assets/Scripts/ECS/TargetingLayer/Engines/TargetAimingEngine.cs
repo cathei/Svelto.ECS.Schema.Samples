@@ -22,13 +22,20 @@ namespace Cathei.Waaagh
 
         public void Step(in float deltaTime)
         {
-            foreach (var result in _indexedDB.Select<CanTargetSet>().FromAll<ICanTargetRow>()
+            foreach (var result in _indexedDB.Select<TargeterSet>().FromAll<ITargeterRow>()
                                             .Join<TargetableSet>().On(_targeted))
             {
                 foreach (var (ia, ib) in result.indices)
                 {
-                    var positionDiff = result.setB.position[ib].value - result.setA.position[ia].value;
-                    result.setA.velocity[ia].direction = positionDiff.normalized;
+                    ref var targeterPosition = ref result.setA.position[ia];
+                    ref var targeterVelocity = ref result.setA.velocity[ia];
+                    ref var targeterTarget = ref result.setA.target[ia];
+
+                    ref var targetablePosition = ref result.setB.position[ib];
+
+                    var positionDiff = targetablePosition.value - targeterPosition.value;
+                    targeterVelocity.direction = positionDiff.normalized;
+                    targeterTarget.cachedDistSqr = positionDiff.sqrMagnitude;
                 }
             }
         }

@@ -14,6 +14,9 @@ namespace Cathei.Waaagh
             public GameObject prefab;
         }
 
+        public float MapWidth;
+        public float MapHeight;
+
         public List<PrefabInfo> prefabInfos;
     }
 }

@@ -12,6 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e04d88451c060464bbb3640e3e9a51b3, type: 3}
   m_Name: DesignsDB
   m_EditorClassIdentifier: 
+  MapWidth: 40
+  MapHeight: 40
   prefabInfos:
   - prefabID: 0
     prefab: {fileID: 3683602561263397046, guid: 553e8f14ebcb2459485b40c0692c2e82, type: 3}

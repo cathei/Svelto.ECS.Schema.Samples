@@ -6,6 +6,16 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
+    public struct GameObjectInitSet : IResultSet<TintComponent>
+    {
+        public NB<TintComponent> tint;
+
+        public void Init(in EntityCollection<TintComponent> buffers)
+        {
+            (tint, _) = buffers;
+        }
+    }
+
     public struct GameObjectSet : IResultSet<PositionComponent, GameObjectComponent, TintComponent>
     {
         public NB<PositionComponent> position;
@@ -29,6 +39,7 @@ namespace Cathei.Waaagh
     }
 
     public interface IGameObjectRow :
+        IQueryableRow<GameObjectInitSet>,
         IQueryableRow<GameObjectSet>,
         IReactiveRow<GameObjectComponent>,
         IQueryableRow<DamageFeedbackSet>

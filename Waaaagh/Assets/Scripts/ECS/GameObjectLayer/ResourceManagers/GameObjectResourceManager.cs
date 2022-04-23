@@ -31,16 +31,19 @@ namespace Cathei.Waaagh
             _pool = new GameObjectPool();
         }
 
-        public uint Create(PrefabID prefabID)
+        public EcsBridgeComponent Create(ref GameObjectComponent component)
         {
             uint id = _nextInstanceID++;
 
-            var go = _pool.Use((int)prefabID, SpawnNewGameObject(prefabID));
-
+            var go = _pool.Use((int)component.prefabID, SpawnNewGameObject(component.prefabID));
             go.transform.SetParent(_rootActive.transform);
 
-            _idToInstances[id] = go.GetComponent<EcsBridgeComponent>();
-            return id;
+            var bridge = go.GetComponent<EcsBridgeComponent>();
+
+            _idToInstances[id] = bridge;
+            component.instanceID = id;
+
+            return bridge;
         }
 
         private Func<GameObject> SpawnNewGameObject(PrefabID prefabID)
@@ -57,15 +60,15 @@ namespace Cathei.Waaagh
             return _idToInstances[instanceID];
         }
 
-        public void Return(PrefabID prefabID, uint instanceID)
+        public void Return(ref GameObjectComponent component)
         {
-            var bridge = _idToInstances[instanceID];
+            var bridge = _idToInstances[component.instanceID];
 
-            _pool.Recycle(bridge.gameObject, (int)prefabID);
+            _pool.Recycle(bridge.gameObject, (int)component.prefabID);
 
             bridge.transform.SetParent(_rootInactive.transform);
 
-            _idToInstances.Remove(instanceID);
+            _idToInstances.Remove(component.instanceID);
         }
 
         public void Dispose()

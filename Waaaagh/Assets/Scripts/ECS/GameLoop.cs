@@ -21,7 +21,8 @@ namespace Cathei.Waaagh
 
         public void Dispose()
         {
-            Destroy(gameObject);
+            if (this != null)
+                Destroy(gameObject);
         }
 
         public static GameLoop Create(

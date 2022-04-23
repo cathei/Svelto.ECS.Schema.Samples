@@ -10,10 +10,9 @@ namespace Cathei.Waaagh
         public PrefabID prefabID;
         public uint instanceID;
 
-        public GameObjectComponent(PrefabID prefabID, uint instanceID)
+        public GameObjectComponent(PrefabID prefabID) : this()
         {
             this.prefabID = prefabID;
-            this.instanceID = instanceID;
         }
     }
 }

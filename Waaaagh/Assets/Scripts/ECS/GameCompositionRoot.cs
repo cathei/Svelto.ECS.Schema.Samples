@@ -49,7 +49,7 @@ namespace Cathei.Waaagh
 
             _enginesRoot.AddEngine(tickableEnginesGroup);
 
-            BuildInitialEntities(entityFactory, schema);
+            BuildInitialEntities(entityFactory, schema, designsDB);
 
             _gameLoop = GameLoop.Create(_simpleSubmitScheduler, tickableEnginesGroup);
         }
@@ -71,26 +71,26 @@ namespace Cathei.Waaagh
             }
         }
 
-        private Vector3 GetRandomPosition()
+        private Vector3 GetRandomPosition(DesignsDB designsDB)
         {
             return new(
-                UnityEngine.Random.Range(-5f, 5f),
-                UnityEngine.Random.Range(-5f, 5f),
+                UnityEngine.Random.Range(-designsDB.MapWidth / 2f, designsDB.MapWidth / 2f),
+                UnityEngine.Random.Range(-designsDB.MapHeight / 2f, designsDB.MapHeight / 2f),
                 0);
         }
 
-        private void BuildInitialEntities(IEntityFactory factory, GameSchema schema)
+        private void BuildInitialEntities(IEntityFactory factory, GameSchema schema, DesignsDB designsDB)
         {
             for (uint i = 0; i < 100; ++i)
             {
                 var builder = factory.Build(schema.Guardman, i);
-                builder.Init(new PositionComponent(GetRandomPosition()));
+                builder.Init(new PositionComponent(GetRandomPosition(designsDB)));
             }
 
             for (uint i = 0; i < 100; ++i)
             {
                 var builder = factory.Build(schema.Orcs, i);
-                builder.Init(new PositionComponent(GetRandomPosition()));
+                builder.Init(new PositionComponent(GetRandomPosition(designsDB)));
             }
         }
     }

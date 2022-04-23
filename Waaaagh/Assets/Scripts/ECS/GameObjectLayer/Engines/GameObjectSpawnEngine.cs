@@ -24,9 +24,13 @@ namespace Cathei.Waaagh
         public void Add(in EntityCollection<GameObjectComponent> collection, RangedIndices indices, ExclusiveGroupStruct group)
         {
             var (instance, _) = collection;
+            var initSet = indexedDB.Select<GameObjectInitSet>().From(group);
 
             foreach (var i in indices)
-                instance[i].instanceID = _goManager.Create(instance[i].prefabID);
+            {
+                var bridge = _goManager.Create(ref instance[i]);
+                initSet.tint[i].value = bridge.originalColor;
+            }
         }
 
         public void Remove(in EntityCollection<GameObjectComponent> collection, RangedIndices indices, ExclusiveGroupStruct group)
@@ -34,7 +38,7 @@ namespace Cathei.Waaagh
             var (instance, _) = collection;
 
             foreach (var i in indices)
-                _goManager.Return(instance[i].prefabID, instance[i].instanceID);
+                _goManager.Return(ref instance[i]);
         }
     }
 }

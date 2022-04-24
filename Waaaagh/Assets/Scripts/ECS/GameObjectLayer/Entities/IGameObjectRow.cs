@@ -6,14 +6,15 @@ using Svelto.ECS.Schema;
 
 namespace Cathei.Waaagh
 {
-    public struct GameObjectInitSet : IResultSet<PositionComponent, TintComponent>
+    public struct GameObjectInitSet : IResultSet<PositionComponent, TeamComponent, TintComponent>
     {
         public NB<PositionComponent> position;
+        public NB<TeamComponent> team;
         public NB<TintComponent> tint;
 
-        public void Init(in EntityCollection<PositionComponent, TintComponent> buffers)
+        public void Init(in EntityCollection<PositionComponent, TeamComponent, TintComponent> buffers)
         {
-            (position, tint, _) = buffers;
+            (position, team, tint, _) = buffers;
         }
     }
 

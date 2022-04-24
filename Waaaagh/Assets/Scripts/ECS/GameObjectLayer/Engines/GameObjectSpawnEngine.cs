@@ -30,6 +30,7 @@ namespace Cathei.Waaagh
             {
                 var bridge = _goManager.Create(ref instance[i]);
                 bridge.transform.position = initSet.position[i].value;
+                bridge.teamID = initSet.team[i].team;
                 initSet.tint[i].value = bridge.originalColor;
             }
         }

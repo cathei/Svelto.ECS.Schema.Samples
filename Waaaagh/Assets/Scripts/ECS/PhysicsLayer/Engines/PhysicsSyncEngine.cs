@@ -28,9 +28,18 @@ namespace Cathei.Waaagh
                 {
                     ref var go = ref result.set.gameObject[i];
                     ref var position = ref result.set.position[i];
+                    ref var colliding = ref result.set.colliding[i];
 
                     var bridge = _goManager.Get(go.instanceID);
                     position.value = bridge.transform.position;
+
+                    // we pick the first entity as contacting entity
+                    // if for many-to-many relationship we need to define new entity
+                    foreach (var other in bridge.contacted)
+                    {
+                        _indexedDB.Update(ref colliding, result.egid[i], other);
+                        break;
+                    }
                 }
             }
         }

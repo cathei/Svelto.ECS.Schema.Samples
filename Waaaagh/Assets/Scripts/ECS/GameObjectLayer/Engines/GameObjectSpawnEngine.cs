@@ -23,7 +23,7 @@ namespace Cathei.Waaagh
 
         public void Add(in EntityCollection<GameObjectComponent> collection, RangedIndices indices, ExclusiveGroupStruct group)
         {
-            var (instance, _) = collection;
+            var (instance, entityIDs, _) = collection;
             var initSet = indexedDB.Select<GameObjectInitSet>().From(group);
 
             foreach (var i in indices)
@@ -31,6 +31,7 @@ namespace Cathei.Waaagh
                 var bridge = _goManager.Create(ref instance[i]);
                 bridge.transform.position = initSet.position[i].value;
                 bridge.teamID = initSet.team[i].team;
+                bridge.selfReference = indexedDB.GetEntityReference(entityIDs[i], group);
                 initSet.tint[i].value = bridge.originalColor;
             }
         }

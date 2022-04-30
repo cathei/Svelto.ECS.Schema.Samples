@@ -18,6 +18,7 @@ namespace Cathei.Waaagh
     }
 
     public interface IDamagableRow :
-        IQueryableRow<DamagableSet>
+        IQueryableRow<DamagableSet>,
+        IReferenceableRow<CollidingComponent>
     { }
 }

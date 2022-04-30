@@ -7,14 +7,15 @@ using Svelto.ECS.Schema.Internal;
 
 namespace Cathei.Waaagh
 {
-    public struct PhysicsSyncSet : IResultSet<GameObjectComponent, PositionComponent>
+    public struct PhysicsSyncSet : IResultSet<GameObjectComponent, PositionComponent, CollidingComponent>
     {
         public NB<GameObjectComponent> gameObject;
         public NB<PositionComponent> position;
+        public NB<CollidingComponent> colliding;
 
-        public void Init(in EntityCollection<GameObjectComponent, PositionComponent> buffers)
+        public void Init(in EntityCollection<GameObjectComponent, PositionComponent, CollidingComponent> buffers)
         {
-            (gameObject, position, _) = buffers;
+            (gameObject, position, colliding, _) = buffers;
         }
     }
 

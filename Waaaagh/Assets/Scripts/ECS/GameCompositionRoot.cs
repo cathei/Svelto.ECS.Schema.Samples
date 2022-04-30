@@ -41,7 +41,7 @@ namespace Cathei.Waaagh
             PhysicsLayerComposition.Compose(AddEngine, indexedDB, goManager);
             TargetingLayerComposition.Compose(AddEngine, indexedDB, schema.Targeted);
             MovementLayerComposition.Compose(AddEngine, indexedDB);
-            DamageLayerComposition.Compose(AddEngine, indexedDB, schema.Damaged);
+            DamageLayerComposition.Compose(AddEngine, indexedDB, goManager, schema.Colliding, schema.Damaged);
             StatusLayerComposition.Compose(AddEngine, indexedDB);
             SpawningLayerComposition.Compose(AddEngine, indexedDB);
             GameObjectLayerComposition.Compose(AddEngine, indexedDB, goManager, schema.Damaged);

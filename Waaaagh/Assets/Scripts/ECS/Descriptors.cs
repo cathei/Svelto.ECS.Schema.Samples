@@ -10,11 +10,11 @@ namespace Cathei.Waaagh
     { }
 
     public interface IProjectileRow :
-        IGameObjectRow, IPhysicsRow, ICanAttackRow
+        IGameObjectRow, IPhysicsRow, IDamagerRow
     { }
 
     public interface ICharacterRow :
-        IUnitRow, IMovableRow, ICanAttackRow, IBurnableRow
+        IUnitRow, IMovableRow, IDamagerRow, IBurnableRow
     { }
 
     public interface IBuildingRow :

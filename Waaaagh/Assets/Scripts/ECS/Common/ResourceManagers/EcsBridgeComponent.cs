@@ -28,7 +28,7 @@ namespace Cathei.Waaagh
         public void OnTriggerEnter2D(Collider2D other)
         {
             var otherBridge = other.GetComponent<EcsBridgeComponent>();
-            if (otherBridge != null)
+            if (otherBridge != null && otherBridge.teamID != teamID)
                 contacted.Add(otherBridge.selfReference);
         }
 

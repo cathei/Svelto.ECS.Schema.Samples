@@ -11,9 +11,11 @@ namespace Cathei.Waaagh
 {
     public static class DamageLayerComposition
     {
-        public static void Compose(Action<IEngine> addEngine, IndexedDB indexedDB, IEntityMemo<IDamagableRow> damaged)
+        public static void Compose(Action<IEngine> addEngine, IndexedDB indexedDB,
+            GameObjectManager goManager, IForeignKey<CollidingComponent, IDamagableRow> colliding,
+            IEntityMemo<IDamagableRow> damaged)
         {
-            addEngine(new ApplyDamageEngine(indexedDB, damaged));
+            addEngine(new ApplyDamageEngine(indexedDB, goManager, colliding, damaged));
         }
     }
 }
